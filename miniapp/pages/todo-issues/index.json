@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "待我处理",
+  "usingComponents": {
+    "issue-card": "/components/issue-card/index"
+  }
+}

@@ -1,0 +1,122 @@
+<view class="page-shell safe-bottom">
+  <view wx:if="{{projectMissing}}" class="glass-card">
+    <view class="section-kicker">Project Required</view>
+    <view class="section-title">请先选择项目</view>
+    <view class="section-desc">问题录入和 OPL 查看都按项目进行。</view>
+    <button class="primary-btn" bindtap="goSelectProject">选择项目</button>
+  </view>
+
+  <block wx:else>
+    <view class="glass-card">
+      <view class="section-kicker">Field Report</view>
+      <view class="section-title">现场新问题</view>
+      <view class="report-grid">
+        <view class="report-item">
+          <view class="metric-label">当前项目</view>
+          <view class="report-value">{{currentProject.projectName}}</view>
+        </view>
+        <view class="report-item">
+          <view class="metric-label">录入人</view>
+          <view class="report-value">{{currentUser.realName || currentUser.username || '-'}}</view>
+        </view>
+        <view class="report-item">
+          <view class="metric-label">录入时间</view>
+          <view class="report-value">{{submitTimeLabel}}</view>
+        </view>
+      </view>
+      <button class="secondary-btn" bindtap="switchProject">切换项目</button>
+    </view>
+
+    <view class="glass-card form-card">
+      <view class="field-block">
+        <text class="field-label">问题标题</text>
+        <input class="field-input" data-field="title" placeholder="如：取料定位偏移导致抓取失败" bindinput="onInput" />
+      </view>
+
+      <view class="field-block">
+        <text class="field-label">问题描述</text>
+        <textarea
+          class="field-textarea"
+          data-field="description"
+          placeholder="补充现场现象、影响范围、当前状态"
+          bindinput="onInput"
+        ></textarea>
+      </view>
+
+      <view class="field-block">
+        <text class="field-label">优先级</text>
+        <view class="chip-row">
+          <view
+            wx:for="{{priorityOptions}}"
+            wx:key="value"
+            class="chip {{form.priority === item.value ? 'active' : ''}}"
+            data-value="{{item.value}}"
+            bindtap="selectPriority"
+          >
+            {{item.label}}
+          </view>
+        </view>
+      </view>
+
+      <view class="field-block">
+        <text class="field-label">影响等级</text>
+        <view class="chip-row">
+          <view
+            wx:for="{{impactOptions}}"
+            wx:key="value"
+            class="chip {{form.impactLevel === item.value ? 'active' : ''}}"
+            data-value="{{item.value}}"
+            bindtap="selectImpact"
+          >
+            {{item.label}}
+          </view>
+        </view>
+      </view>
+
+      <view class="switch-grid">
+        <view class="switch-card">
+          <view class="switch-title">影响出货</view>
+          <switch color="#cb5d1f" checked="{{form.affectShipment}}" data-field="affectShipment" bindchange="onSwitchChange" />
+        </view>
+        <view class="switch-card">
+          <view class="switch-title">影响联调</view>
+          <switch color="#cb5d1f" checked="{{form.affectCommissioning}}" data-field="affectCommissioning" bindchange="onSwitchChange" />
+        </view>
+        <view class="switch-card">
+          <view class="switch-title">需要停机</view>
+          <switch color="#cb5d1f" checked="{{form.needShutdown}}" data-field="needShutdown" bindchange="onSwitchChange" />
+        </view>
+      </view>
+    </view>
+
+    <view class="glass-card upload-card">
+      <view class="section-kicker">Media</view>
+      <view class="upload-title">现场照片 / 视频</view>
+      <view class="tag-row rule-row">
+        <view class="tag orange">{{mediaRuleLabel}}</view>
+        <view class="tag blue">自动压缩</view>
+      </view>
+
+      <view class="upload-actions">
+        <button class="secondary-btn" loading="{{uploadLoading}}" bindtap="chooseImage">上传照片</button>
+        <button class="secondary-btn" loading="{{uploadLoading}}" bindtap="chooseVideo">上传视频</button>
+      </view>
+
+      <view wx:if="{{attachments.length}}" class="media-grid">
+        <view wx:for="{{attachments}}" wx:key="objectKey" class="media-card">
+          <view class="media-top">
+            <view>
+              <view class="media-type">{{item.viewType}}</view>
+              <view class="media-name">{{item.fileName}}</view>
+              <view class="media-meta">{{item.viewSize}}</view>
+              <view wx:if="{{item.viewDuration}}" class="media-meta">时长 {{item.viewDuration}}</view>
+            </view>
+            <view class="remove-link" data-index="{{index}}" bindtap="removeAttachment">删除</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <button class="primary-btn" bindtap="submit">提交问题</button>
+  </block>
+</view>

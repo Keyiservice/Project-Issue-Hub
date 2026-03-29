@@ -1,0 +1,12 @@
+<view class="page-shell safe-bottom">
+  <view class="glass-card">
+    <view class="section-kicker">Assigned To Me</view>
+    <view class="section-title">待我处理</view>
+    <view class="section-desc">这里聚焦我负责的问题，目标只有一个：尽快推动状态往闭环方向走。</view>
+  </view>
+
+  <view wx:if="{{list.length}}" class="issue-list">
+    <issue-card wx:for="{{list}}" wx:key="id" issue="{{item}}" bind:tap="goDetail" />
+  </view>
+  <view wx:else class="empty-card">当前没有分配给你的待处理问题。</view>
+</view>

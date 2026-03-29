@@ -1,0 +1,136 @@
+.selector-hero {
+  overflow: hidden;
+}
+
+.selector-visual {
+  position: relative;
+  height: 220rpx;
+  margin-top: 24rpx;
+  margin-bottom: 22rpx;
+  border-radius: 28rpx;
+  overflow: hidden;
+  background: linear-gradient(145deg, #243544 0%, #1e2b37 48%, #2c4053 100%);
+}
+
+.selector-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.06) 1rpx, transparent 1rpx),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1rpx, transparent 1rpx);
+  background-size: 28rpx 28rpx;
+}
+
+.selector-beam {
+  position: absolute;
+  left: 36rpx;
+  right: 36rpx;
+  top: 86rpx;
+  height: 8rpx;
+  border-radius: 999rpx;
+  background: linear-gradient(90deg, rgba(233, 145, 64, 0.12), rgba(233, 145, 64, 0.76), rgba(233, 145, 64, 0.12));
+}
+
+.selector-badge {
+  position: absolute;
+  padding: 12rpx 18rpx;
+  border-radius: 16rpx;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1rpx solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-size: 22rpx;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.badge-a {
+  left: 36rpx;
+  top: 34rpx;
+}
+
+.badge-b {
+  right: 36rpx;
+  bottom: 34rpx;
+}
+
+.selector-tower {
+  position: absolute;
+  width: 110rpx;
+  border-radius: 18rpx 18rpx 0 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04));
+  bottom: 0;
+}
+
+.tower-left {
+  left: 90rpx;
+  height: 118rpx;
+}
+
+.tower-right {
+  right: 90rpx;
+  height: 144rpx;
+}
+
+.search-block {
+  margin-top: 10rpx;
+}
+
+.project-grid {
+  margin-top: 20rpx;
+}
+
+.project-card {
+  margin-bottom: 18rpx;
+}
+
+.project-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.project-title {
+  margin-top: 10rpx;
+  font-size: 36rpx;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #17212b;
+}
+
+.project-desc {
+  margin-top: 16rpx;
+  color: #647382;
+  line-height: 1.8;
+}
+
+.project-info-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-top: 18rpx;
+}
+
+.project-info-item {
+  width: calc(50% - 8rpx);
+  padding: 18rpx 20rpx;
+  border-radius: 20rpx;
+  background: rgba(255, 255, 255, 0.84);
+  border: 1rpx solid rgba(23, 33, 43, 0.06);
+}
+
+.project-info-value {
+  margin-top: 8rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #17212b;
+}
+
+.project-tags {
+  gap: 10rpx;
+  margin-top: 14rpx;
+}
+
+.project-entry {
+  margin-top: 18rpx;
+}

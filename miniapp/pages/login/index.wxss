@@ -1,0 +1,45 @@
+.login-shell {
+  padding-top: 20rpx;
+}
+
+.login-hero {
+  background:
+    radial-gradient(circle at top left, rgba(203, 93, 31, 0.12), transparent 48%),
+    rgba(255, 252, 247, 0.96);
+}
+
+.login-card {
+  padding-bottom: 22rpx;
+}
+
+.card-title {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #17212b;
+}
+
+.card-desc {
+  margin-top: 12rpx;
+  color: #647382;
+  line-height: 1.7;
+}
+
+.tip-card {
+  margin-top: 20rpx;
+  padding: 22rpx 24rpx;
+  border-radius: 20rpx;
+  background: rgba(255, 255, 255, 0.84);
+  border: 1rpx solid rgba(23, 33, 43, 0.06);
+}
+
+.tip-title {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #17212b;
+}
+
+.tip-line {
+  margin-top: 10rpx;
+  color: #647382;
+  line-height: 1.7;
+}

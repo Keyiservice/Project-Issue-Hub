@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "我的问题",
+  "usingComponents": {
+    "issue-card": "/components/issue-card/index"
+  }
+}

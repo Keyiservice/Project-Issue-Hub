@@ -1,0 +1,12 @@
+<view class="page-shell safe-bottom">
+  <view class="glass-card">
+    <view class="section-kicker">My Reports</view>
+    <view class="section-title">我的问题</view>
+    <view class="section-desc">我提交的问题应该能清楚看到当前状态、责任人和推进结果。</view>
+  </view>
+
+  <view wx:if="{{list.length}}" class="issue-list">
+    <issue-card wx:for="{{list}}" wx:key="id" issue="{{item}}" bind:tap="goDetail" />
+  </view>
+  <view wx:else class="empty-card">你当前还没有提交问题。</view>
+</view>

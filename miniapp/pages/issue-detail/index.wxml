@@ -1,0 +1,346 @@
+<view class="page-shell safe-bottom" wx:if="{{detail}}">
+  <view class="glass-card">
+    <view class="section-kicker">{{detail.issueNo}}</view>
+    <view class="section-title detail-title">{{detail.title}}</view>
+    <view class="tag-row detail-tags">
+      <view class="tag {{detail.priorityTone}}">{{detail.priorityLabel}}</view>
+      <view class="tag {{detail.progressTone}}">{{detail.progressLabel}}</view>
+    </view>
+    <view class="section-desc">{{detail.description || '暂无详细描述'}}</view>
+
+    <view wx:if="{{detail.attachments.length}}" class="hero-attachment-strip">
+      <view
+        wx:for="{{detail.attachments}}"
+        wx:key="id"
+        class="hero-attachment-card"
+        data-scope="issue"
+        data-index="{{index}}"
+        bindtap="previewAttachment"
+      >
+        <image
+          wx:if="{{item.fileType === 'IMAGE' && item.previewUrl}}"
+          class="hero-attachment-thumb"
+          src="{{item.previewUrl}}"
+          mode="aspectFill"
+        />
+        <view wx:elif="{{item.fileType === 'VIDEO' && item.previewUrl}}" class="hero-video-wrap">
+          <video class="hero-attachment-thumb video-cover" src="{{item.previewUrl}}" objectFit="cover" muted></video>
+          <view class="hero-video-mask">
+            <view class="hero-video-play">PLAY</view>
+          </view>
+        </view>
+        <view wx:else class="hero-video-thumb">
+          <view class="hero-video-play">{{item.fileType === 'VIDEO' ? 'PLAY' : 'FILE'}}</view>
+          <view class="hero-video-label">{{item.viewType}}</view>
+        </view>
+        <view class="hero-attachment-meta">
+          <view class="hero-attachment-name">{{item.fileName}}</view>
+          <view class="hero-attachment-extra">{{item.viewType}} / {{item.viewSize}}</view>
+        </view>
+      </view>
+    </view>
+
+    <button class="secondary-btn back-project-btn" bindtap="goBackToProject">返回项目 OPL</button>
+  </view>
+
+  <view class="glass-card detail-meta-card">
+    <view class="section-kicker">当前推进</view>
+    <view class="meta-grid">
+      <view class="metric-card">
+        <view class="metric-label">当前阶段</view>
+        <view class="meta-value">{{detail.statusLabel}}</view>
+      </view>
+      <view class="metric-card">
+        <view class="metric-label">责任人</view>
+        <view class="meta-value">{{detail.ownerName || '待分派'}}</view>
+      </view>
+      <view class="metric-card">
+        <view class="metric-label">下一步</view>
+        <view class="meta-value">{{nextActionText}}</view>
+      </view>
+      <view class="metric-card">
+        <view class="metric-label">录入时间</view>
+        <view class="meta-value">{{detail.createdText}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="glass-card" wx:if="{{detail.closedAt || detail.closedByName || detail.closeReason || detail.closeEvidence}}">
+    <view class="section-kicker">关闭信息</view>
+    <view class="meta-grid">
+      <view class="metric-card">
+        <view class="metric-label">关闭人</view>
+        <view class="meta-value">{{detail.closedByName || '-'}}</view>
+      </view>
+      <view class="metric-card">
+        <view class="metric-label">关闭时间</view>
+        <view class="meta-value">{{detail.closedText || '-'}}</view>
+      </view>
+      <view class="metric-card">
+        <view class="metric-label">关闭说明</view>
+        <view class="meta-value">{{detail.closeReason || '-'}}</view>
+      </view>
+      <view class="metric-card">
+        <view class="metric-label">证据说明</view>
+        <view class="meta-value">{{detail.closeEvidence || '-'}}</view>
+      </view>
+    </view>
+
+    <view wx:if="{{detail.closeEvidenceAttachments.length}}" class="evidence-block">
+      <view class="field-label">关闭证据附件</view>
+      <view class="hero-attachment-strip">
+        <view
+          wx:for="{{detail.closeEvidenceAttachments}}"
+          wx:key="id"
+          class="hero-attachment-card"
+          data-scope="close"
+          data-index="{{index}}"
+          bindtap="previewAttachment"
+        >
+          <image
+            wx:if="{{item.fileType === 'IMAGE' && item.previewUrl}}"
+            class="hero-attachment-thumb"
+            src="{{item.previewUrl}}"
+            mode="aspectFill"
+          />
+          <view wx:elif="{{item.fileType === 'VIDEO' && item.previewUrl}}" class="hero-video-wrap">
+            <video class="hero-attachment-thumb video-cover" src="{{item.previewUrl}}" objectFit="cover" muted></video>
+            <view class="hero-video-mask">
+              <view class="hero-video-play">PLAY</view>
+            </view>
+          </view>
+          <view wx:else class="hero-video-thumb">
+            <view class="hero-video-play">{{item.fileType === 'VIDEO' ? 'PLAY' : 'FILE'}}</view>
+            <view class="hero-video-label">{{item.viewType}}</view>
+          </view>
+          <view class="hero-attachment-meta">
+            <view class="hero-attachment-name">{{item.fileName}}</view>
+            <view class="hero-attachment-extra">{{item.viewType}} / {{item.viewSize}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="glass-card">
+    <view class="section-kicker">最新动作</view>
+    <view class="timeline-item">
+      <view class="timeline-head">
+        <view class="timeline-title">{{latestAction.meta}}</view>
+        <view class="timeline-time">{{latestAction.time}}</view>
+      </view>
+      <view class="timeline-content">{{latestAction.content}}</view>
+    </view>
+  </view>
+
+  <view class="glass-card">
+    <view class="section-kicker">基础信息</view>
+    <view class="meta-grid">
+      <view class="metric-card">
+        <view class="metric-label">项目</view>
+        <view class="meta-value">{{detail.projectName}}</view>
+      </view>
+      <view class="metric-card">
+        <view class="metric-label">OPL 编号</view>
+        <view class="meta-value">{{detail.oplNo || '-'}}</view>
+      </view>
+      <view class="metric-card">
+        <view class="metric-label">录入人</view>
+        <view class="meta-value">{{detail.reporterName || '-'}}</view>
+      </view>
+      <view class="metric-card">
+        <view class="metric-label">截止时间</view>
+        <view class="meta-value">{{detail.dueText || '-'}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="glass-card action-card" wx:if="{{actionConfig}}">
+    <view class="section-kicker">下一步操作</view>
+    <view class="action-card-title">{{actionConfig.text}}</view>
+    <view class="action-card-desc">先补充现场图片、视频或处理说明，再推进状态。</view>
+
+    <view wx:if="{{actionConfig.targetStatus === 'CLOSED'}}" class="close-form">
+      <view class="field-block">
+        <view class="field-label">关闭说明</view>
+        <textarea
+          class="field-textarea short-textarea"
+          placeholder="选填，说明为什么可以关闭"
+          value="{{closeReason}}"
+          bindinput="onCloseReasonInput"
+        ></textarea>
+      </view>
+
+      <view class="field-block">
+        <view class="field-label">证据说明</view>
+        <textarea
+          class="field-textarea short-textarea"
+          placeholder="选填，说明关闭证据内容"
+          value="{{closeEvidence}}"
+          bindinput="onCloseEvidenceInput"
+        ></textarea>
+      </view>
+
+      <view class="field-block">
+        <view class="field-label">关闭证据附件</view>
+        <view class="tag-row rule-row">
+          <view class="tag orange">{{mediaRuleLabel}}</view>
+          <view class="tag blue">图片和视频都会作为关闭证据保存</view>
+        </view>
+        <view class="comment-upload-actions">
+          <button class="secondary-btn half-btn" loading="{{uploadLoading}}" bindtap="chooseCloseImage">上传图片</button>
+          <button class="secondary-btn half-btn" loading="{{uploadLoading}}" bindtap="chooseCloseVideo">上传视频</button>
+        </view>
+
+        <view wx:if="{{closeAttachments.length}}" class="hero-attachment-strip">
+          <view
+            wx:for="{{closeAttachments}}"
+            wx:key="objectKey"
+            class="hero-attachment-card"
+            data-scope="draft-close"
+            data-index="{{index}}"
+            bindtap="previewAttachment"
+          >
+            <image
+              wx:if="{{item.fileType === 'IMAGE' && item.previewUrl}}"
+              class="hero-attachment-thumb"
+              src="{{item.previewUrl}}"
+              mode="aspectFill"
+            />
+            <view wx:elif="{{item.fileType === 'VIDEO' && item.previewUrl}}" class="hero-video-wrap">
+              <video class="hero-attachment-thumb video-cover" src="{{item.previewUrl}}" objectFit="cover" muted></video>
+              <view class="hero-video-mask">
+                <view class="hero-video-play">PLAY</view>
+              </view>
+            </view>
+            <view wx:else class="hero-video-thumb">
+              <view class="hero-video-play">{{item.fileType === 'VIDEO' ? 'PLAY' : 'FILE'}}</view>
+              <view class="hero-video-label">{{item.viewType}}</view>
+            </view>
+            <view class="hero-attachment-meta">
+              <view class="hero-attachment-name">{{item.fileName}}</view>
+              <view class="hero-attachment-extra">{{item.viewType}} / {{item.viewSize}}</view>
+              <view class="draft-remove" data-index="{{index}}" catchtap="removeCloseAttachment">移除</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <button class="primary-btn" bindtap="handleStatusAction">{{actionConfig.text}}</button>
+  </view>
+
+  <view class="glass-card">
+    <view class="section-kicker">跟进记录</view>
+    <textarea
+      class="field-textarea"
+      placeholder="补充现场进展、处理结果或风险"
+      value="{{commentContent}}"
+      bindinput="onCommentInput"
+    ></textarea>
+
+    <view class="tag-row rule-row">
+      <view class="tag orange">{{mediaRuleLabel}}</view>
+      <view class="tag blue">图片 / 视频均可</view>
+    </view>
+
+    <view class="comment-upload-actions">
+      <button class="secondary-btn half-btn" loading="{{uploadLoading}}" bindtap="chooseCommentImage">上传图片</button>
+      <button class="secondary-btn half-btn" loading="{{uploadLoading}}" bindtap="chooseCommentVideo">上传视频</button>
+    </view>
+
+    <view wx:if="{{commentAttachments.length}}" class="hero-attachment-strip">
+      <view
+        wx:for="{{commentAttachments}}"
+        wx:key="objectKey"
+        class="hero-attachment-card"
+        data-scope="draft-comment"
+        data-index="{{index}}"
+        bindtap="previewAttachment"
+      >
+        <image
+          wx:if="{{item.fileType === 'IMAGE' && item.previewUrl}}"
+          class="hero-attachment-thumb"
+          src="{{item.previewUrl}}"
+          mode="aspectFill"
+        />
+        <view wx:elif="{{item.fileType === 'VIDEO' && item.previewUrl}}" class="hero-video-wrap">
+          <video class="hero-attachment-thumb video-cover" src="{{item.previewUrl}}" objectFit="cover" muted></video>
+          <view class="hero-video-mask">
+            <view class="hero-video-play">PLAY</view>
+          </view>
+        </view>
+        <view wx:else class="hero-video-thumb">
+          <view class="hero-video-play">{{item.fileType === 'VIDEO' ? 'PLAY' : 'FILE'}}</view>
+          <view class="hero-video-label">{{item.viewType}}</view>
+        </view>
+        <view class="hero-attachment-meta">
+          <view class="hero-attachment-name">{{item.fileName}}</view>
+          <view class="hero-attachment-extra">{{item.viewType}} / {{item.viewSize}}</view>
+          <view class="draft-remove" data-index="{{index}}" catchtap="removeDraftAttachment">移除</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="comment-submit">
+      <button class="primary-btn" bindtap="submitComment">提交跟进</button>
+    </view>
+  </view>
+
+  <view class="glass-card">
+    <view class="section-kicker">时间线</view>
+    <view wx:if="{{detail.comments.length}}" class="timeline">
+      <view wx:for="{{detail.comments}}" wx:key="id" wx:for-index="commentIndex" class="timeline-item">
+        <view class="timeline-head">
+          <view class="timeline-title">{{item.operatorName}}</view>
+          <view class="timeline-time">{{item.createdText}}</view>
+        </view>
+        <view class="tag-row">
+          <view class="tag {{item.badgeTone}}">{{item.badge}}</view>
+        </view>
+        <view class="timeline-content">{{item.content}}</view>
+
+        <view wx:if="{{item.attachments.length}}" class="comment-attachment-grid">
+          <block wx:for="{{item.attachments}}" wx:for-item="attachment" wx:for-index="itemIndex" wx:key="id">
+            <view
+              class="comment-attachment-card"
+              data-scope="comment"
+              data-comment-index="{{commentIndex}}"
+              data-index="{{itemIndex}}"
+              bindtap="previewAttachment"
+            >
+              <image
+                wx:if="{{attachment.fileType === 'IMAGE' && attachment.previewUrl}}"
+                class="comment-attachment-thumb"
+                src="{{attachment.previewUrl}}"
+                mode="aspectFill"
+              />
+              <view wx:elif="{{attachment.fileType === 'VIDEO' && attachment.previewUrl}}" class="comment-video-thumb">
+                <video class="comment-attachment-thumb video-cover" src="{{attachment.previewUrl}}" objectFit="cover" muted></video>
+                <view class="hero-video-mask">
+                  <view class="hero-video-play">PLAY</view>
+                </view>
+              </view>
+              <view wx:else class="comment-video-thumb">
+                <view class="hero-video-play">{{attachment.fileType === 'VIDEO' ? 'PLAY' : 'FILE'}}</view>
+              </view>
+              <view class="comment-attachment-name">{{attachment.fileName}}</view>
+            </view>
+          </block>
+        </view>
+      </view>
+    </view>
+    <view wx:else class="empty-card">当前还没有时间线记录</view>
+  </view>
+
+  <view wx:if="{{previewVisible}}" class="preview-layer" bindtap="closePreviewLayer">
+    <view class="preview-shell" catchtap="noop">
+      <view class="preview-head">
+        <view class="preview-title">{{previewTitle}}</view>
+        <view class="preview-close" bindtap="closePreviewLayer">关闭</view>
+      </view>
+      <image wx:if="{{previewType === 'IMAGE'}}" class="preview-image" src="{{previewUrl}}" mode="aspectFit" />
+      <video wx:else class="preview-video" src="{{previewUrl}}" controls autoplay objectFit="contain"></video>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,93 @@
+<view class="page-shell safe-bottom">
+  <view class="ambient-rig">
+    <view class="ambient-grid"></view>
+    <view class="ambient-glow ambient-glow-left"></view>
+    <view class="ambient-glow ambient-glow-right"></view>
+    <view class="ambient-line ambient-line-top"></view>
+    <view class="ambient-line ambient-line-bottom"></view>
+  </view>
+
+  <view wx:if="{{projectMissing}}" class="glass-card">
+    <view class="section-kicker">Project Required</view>
+    <view class="section-title">请先选择项目</view>
+    <view class="section-desc">项目问题库按项目独立查看，先选项目再进入问题清单。</view>
+    <button class="primary-btn" bindtap="goSelectProject">选择项目</button>
+  </view>
+
+  <block wx:else>
+    <view class="glass-card command-card">
+      <view class="section-kicker">Project OPL</view>
+      <view class="section-title">{{currentProject.projectName}}</view>
+      <view class="section-desc">整项目视角查看 OPL，列表可按责任人和状态筛选。</view>
+
+      <view class="project-banner">
+        <view>
+          <view class="metric-label">已加载 / 总数</view>
+          <view class="project-name">{{summary.loaded}} / {{summary.total}}</view>
+        </view>
+        <button class="mini-switch-btn" bindtap="switchProject">切换项目</button>
+      </view>
+
+      <view class="field-block search-block">
+        <input class="field-input" placeholder="搜索问题编号 / 标题 / OPL" bindinput="onKeywordInput" />
+      </view>
+
+      <view class="owner-filter">
+        <view class="metric-label">责任人</view>
+        <picker mode="selector" range="{{ownerOptions}}" range-key="label" value="{{ownerIndex}}" bindchange="onOwnerChange">
+          <view class="picker-field">
+            <text class="picker-text">{{ownerLabel}}</text>
+            <text class="picker-arrow">切换</text>
+          </view>
+        </picker>
+      </view>
+
+      <button class="secondary-btn search-button" bindtap="handleSearch">应用筛选</button>
+
+      <view class="chip-row">
+        <view
+          wx:for="{{statusTabs}}"
+          wx:key="value"
+          class="chip {{status === item.value ? 'active' : ''}}"
+          data-value="{{item.value}}"
+          bindtap="chooseStatus"
+        >
+          {{item.label}}
+        </view>
+      </view>
+
+      <view class="metric-grid metric-grid-quad">
+        <view class="metric-card">
+          <view class="metric-label">整项目总数</view>
+          <view class="metric-value">{{summary.total}}</view>
+          <view class="metric-note">不受翻页影响</view>
+        </view>
+        <view class="metric-card">
+          <view class="metric-label">处理中</view>
+          <view class="metric-value">{{summary.processing}}</view>
+          <view class="metric-note">处理中 / 待验证</view>
+        </view>
+        <view class="metric-card">
+          <view class="metric-label">已超期</view>
+          <view class="metric-value">{{summary.overdue}}</view>
+          <view class="metric-note">当前项目全部超期项</view>
+        </view>
+        <view class="metric-card">
+          <view class="metric-label">已关闭</view>
+          <view class="metric-value">{{summary.closed}}</view>
+          <view class="metric-note">当前项目已闭环</view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{lastError}}" class="empty-card">{{lastError}}</view>
+
+    <view wx:if="{{list.length}}" class="issue-list">
+      <issue-card wx:for="{{list}}" wx:key="id" issue="{{item}}" bind:tap="goDetail" />
+    </view>
+    <view wx:elif="{{!loading}}" class="empty-card">当前筛选条件下没有问题</view>
+
+    <view wx:if="{{loading}}" class="empty-card">加载中...</view>
+    <view wx:if="{{!loading && hasMore}}" class="empty-card">上拉继续加载</view>
+  </block>
+</view>

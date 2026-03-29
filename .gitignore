@@ -1,0 +1,17 @@
+.idea/
+.vscode/
+node_modules/
+dist/
+target/
+.DS_Store
+*.log
+*.iml
+__pycache__/
+*.pyc
+.env
+project.config.json
+project.private.config.json
+temp_issue_193.png
+miniapp/project.private.config.json
+web-admin/.env.local
+backend/.mvn/

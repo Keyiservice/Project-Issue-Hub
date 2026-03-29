@@ -1,0 +1,22 @@
+{
+  "pages": [
+    "pages/login/index",
+    "pages/home/index",
+    "pages/project-select/index",
+    "pages/project-hub/index",
+    "pages/project-stats/index",
+    "pages/issue-create/index",
+    "pages/issue-list/index",
+    "pages/issue-detail/index",
+    "pages/my-issues/index",
+    "pages/todo-issues/index",
+    "pages/profile/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "Project Issue Hub",
+    "navigationBarBackgroundColor": "#f7f1e8",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f4efe6"
+  },
+  "sitemapLocation": "sitemap.json"
+}

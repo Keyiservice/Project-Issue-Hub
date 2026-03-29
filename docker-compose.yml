@@ -1,0 +1,123 @@
+services:
+  mysql:
+    image: ${MYSQL_IMAGE:-mysql:8.0.37}
+    container_name: opl-mysql
+    restart: unless-stopped
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-time-zone=+08:00
+      - --lower_case_table_names=1
+    environment:
+      MYSQL_ROOT_PASSWORD: root123456
+      MYSQL_DATABASE: opl_platform
+      TZ: Asia/Shanghai
+    ports:
+      - "${MYSQL_HOST_PORT:-3307}:3306"
+    volumes:
+      - ./database/mysql/init:/docker-entrypoint-initdb.d
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p${MYSQL_ROOT_PASSWORD:-root123456} --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 20s
+    networks:
+      - opl-net
+
+  redis:
+    image: ${REDIS_IMAGE:-redis:7.2-alpine}
+    container_name: opl-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass redis123456
+    environment:
+      TZ: Asia/Shanghai
+    ports:
+      - "${REDIS_HOST_PORT:-6380}:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - opl-net
+
+  minio:
+    image: ${MINIO_IMAGE:-minio/minio:RELEASE.2024-12-18T13-15-44Z}
+    container_name: opl-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+      TZ: Asia/Shanghai
+    ports:
+      - "${MINIO_API_HOST_PORT:-9002}:9000"
+      - "${MINIO_CONSOLE_HOST_PORT:-9003}:9001"
+    volumes:
+      - minio-data:/data
+    networks:
+      - opl-net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        MAVEN_IMAGE: ${MAVEN_IMAGE:-maven:3.9.9-eclipse-temurin-17}
+        JRE_IMAGE: ${JRE_IMAGE:-maven:3.9.9-eclipse-temurin-17}
+    container_name: opl-backend
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      TZ: Asia/Shanghai
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DB: opl_platform
+      MYSQL_USERNAME: root
+      MYSQL_PASSWORD: root123456
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: redis123456
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_ENDPOINT:-http://172.26.112.1:9002}
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin123
+      MINIO_BUCKET: opl-attachments
+      WECHAT_MINIAPP_MOCK_ENABLED: ${WECHAT_MINIAPP_MOCK_ENABLED:-true}
+      WECHAT_MINIAPP_APP_ID: ${WECHAT_MINIAPP_APP_ID:-}
+      WECHAT_MINIAPP_SECRET: ${WECHAT_MINIAPP_SECRET:-}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      minio:
+        condition: service_started
+    ports:
+      - "${BACKEND_HOST_PORT:-8081}:8080"
+    networks:
+      - opl-net
+
+  web:
+    build:
+      context: ./web-admin
+      dockerfile: Dockerfile
+      args:
+        NODE_IMAGE: ${NODE_IMAGE:-node:20-alpine}
+        NGINX_IMAGE: ${NGINX_IMAGE:-nginx:alpine}
+    container_name: opl-web
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "${WEB_HOST_PORT:-80}:80"
+    networks:
+      - opl-net
+
+volumes:
+  mysql-data:
+  redis-data:
+  minio-data:
+
+networks:
+  opl-net:
+    driver: bridge

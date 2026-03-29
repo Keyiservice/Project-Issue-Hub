@@ -1,0 +1,249 @@
+.stats-hero-head {
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+}
+
+.stats-hero-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.stats-back-btn {
+  margin-top: 0;
+}
+
+.stats-hero .metric-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.stats-hero .metric-card {
+  width: calc(50% - 8rpx);
+}
+
+.stats-title {
+  margin-top: 8rpx;
+  font-size: 36rpx;
+}
+
+.bar-item {
+  margin-top: 22rpx;
+}
+
+.bar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+}
+
+.bar-label {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #17212b;
+}
+
+.bar-value {
+  color: #647382;
+  font-size: 24rpx;
+}
+
+.bar-track {
+  height: 18rpx;
+  margin-top: 12rpx;
+  border-radius: 999rpx;
+  background: rgba(100, 115, 130, 0.12);
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  min-width: 12rpx;
+  border-radius: 999rpx;
+}
+
+.tone-orange {
+  background: linear-gradient(90deg, rgba(203, 93, 31, 0.6), #cb5d1f);
+}
+
+.tone-blue {
+  background: linear-gradient(90deg, rgba(35, 95, 167, 0.5), #245fa7);
+}
+
+.tone-teal {
+  background: linear-gradient(90deg, rgba(15, 118, 110, 0.5), #0f766e);
+}
+
+.tone-amber {
+  background: linear-gradient(90deg, rgba(183, 114, 29, 0.5), #b7721d);
+}
+
+.tone-rose {
+  background: linear-gradient(90deg, rgba(198, 92, 78, 0.5), #c65c4e);
+}
+
+.tone-gray,
+.tone-slate {
+  background: linear-gradient(90deg, rgba(100, 115, 130, 0.48), #647382);
+}
+
+.focus-item {
+  position: relative;
+  margin-top: 16rpx;
+  overflow: hidden;
+  border-radius: 24rpx;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(247, 243, 236, 0.92));
+  border: 1rpx solid rgba(23, 33, 43, 0.08);
+  box-shadow: 0 10rpx 24rpx rgba(56, 45, 27, 0.05);
+}
+
+.focus-item:first-child {
+  margin-top: 22rpx;
+}
+
+.focus-accent {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 10rpx;
+}
+
+.accent-amber,
+.accent-orange {
+  background: linear-gradient(180deg, #d88739, #cb5d1f);
+}
+
+.accent-rose {
+  background: linear-gradient(180deg, #e18076, #c65c4e);
+}
+
+.accent-blue {
+  background: linear-gradient(180deg, #4d7fbb, #245fa7);
+}
+
+.accent-teal {
+  background: linear-gradient(180deg, #3e998f, #0f766e);
+}
+
+.accent-gray,
+.accent-slate {
+  background: linear-gradient(180deg, #8a97a3, #647382);
+}
+
+.focus-body {
+  padding: 22rpx 22rpx 22rpx 30rpx;
+}
+
+.focus-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.focus-no {
+  font-size: 20rpx;
+  letter-spacing: 0.14em;
+  color: #8b99a7;
+}
+
+.focus-badge {
+  padding: 10rpx 18rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.badge-orange,
+.badge-amber {
+  color: #a34612;
+  background: rgba(203, 93, 31, 0.12);
+}
+
+.badge-blue {
+  color: #164a84;
+  background: rgba(35, 95, 167, 0.12);
+}
+
+.badge-teal {
+  color: #0b5b55;
+  background: rgba(15, 118, 110, 0.12);
+}
+
+.badge-rose {
+  color: #9f4135;
+  background: rgba(198, 92, 78, 0.12);
+}
+
+.badge-gray,
+.badge-slate {
+  color: #556575;
+  background: rgba(100, 115, 130, 0.12);
+}
+
+.focus-title {
+  margin-top: 10rpx;
+  font-size: 30rpx;
+  line-height: 1.5;
+  font-weight: 700;
+  color: #17212b;
+}
+
+.focus-meta-board {
+  display: flex;
+  gap: 14rpx;
+  margin-top: 16rpx;
+}
+
+.focus-meta-card {
+  width: calc(50% - 7rpx);
+  padding: 16rpx 18rpx;
+  border-radius: 18rpx;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1rpx solid rgba(23, 33, 43, 0.06);
+}
+
+.focus-meta-label {
+  font-size: 20rpx;
+  color: #8b99a7;
+  letter-spacing: 0.12em;
+}
+
+.focus-meta-value {
+  margin-top: 8rpx;
+  font-size: 25rpx;
+  line-height: 1.45;
+  font-weight: 700;
+  color: #24313d;
+}
+
+.focus-next-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20rpx;
+  margin-top: 16rpx;
+}
+
+.focus-next {
+  margin-top: 8rpx;
+  color: #4d5f70;
+  font-size: 26rpx;
+  font-weight: 600;
+}
+
+.focus-enter {
+  padding: 10rpx 16rpx;
+  border-radius: 999rpx;
+  background: rgba(36, 53, 68, 0.08);
+  color: #243544;
+  font-size: 22rpx;
+  font-weight: 700;
+  white-space: nowrap;
+}

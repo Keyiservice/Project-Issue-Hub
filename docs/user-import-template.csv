@@ -1,0 +1,5 @@
+账号,姓名,部门编码,部门名称,角色代码,手机号,邮箱
+zhang.peng,张鹏,FS21_ENG,FS21 Engineering,RESP_ENGINEER|MECHANICAL_ENGINEER,13800000001,zhang.peng@example.com
+xuchu.liu,刘旭初,FS21_ENG,FS21 Engineering,RESP_ENGINEER|AUTOMATION_ENGINEER,13800000002,xuchu.liu@example.com
+pm.fs21,项目经理,PM,Project Management,PROJECT_MANAGER|DESIGN_MANAGER,13800000003,pm.fs21@example.com
+factory.rep,工厂代表,FS21_MFG,FS21 Manufacturing,MANAGEMENT|PLANT_REPRESENTATIVE,13800000004,factory.rep@example.com

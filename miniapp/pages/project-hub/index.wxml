@@ -1,0 +1,103 @@
+<view class="page-shell safe-bottom">
+  <view class="ambient-rig">
+    <view class="ambient-grid"></view>
+    <view class="ambient-glow ambient-glow-left"></view>
+    <view class="ambient-glow ambient-glow-right"></view>
+    <view class="ambient-line ambient-line-top"></view>
+    <view class="ambient-line ambient-line-bottom"></view>
+  </view>
+
+  <view class="glass-card compact-hero command-card" wx:if="{{currentProject}}">
+    <view class="compact-head">
+      <view>
+        <view class="section-kicker">Project Workbench</view>
+        <view class="section-title">{{currentProject.projectName}}</view>
+        <view class="section-desc">录入、问题库、统计和待办收在一个工作台，不再拉太长。</view>
+      </view>
+      <button class="mini-switch-btn" bindtap="switchProject">切换项目</button>
+    </view>
+
+    <view class="compact-metric-grid">
+      <view class="compact-metric-card">
+        <view class="metric-label">全部 OPL</view>
+        <view class="metric-value">{{summary.totalIssues}}</view>
+      </view>
+      <view class="compact-metric-card">
+        <view class="metric-label">处理中</view>
+        <view class="metric-value">{{summary.openIssues}}</view>
+      </view>
+      <view class="compact-metric-card">
+        <view class="metric-label">已超期</view>
+        <view class="metric-value">{{summary.overdueIssues}}</view>
+      </view>
+      <view class="compact-metric-card">
+        <view class="metric-label">待验证</view>
+        <view class="metric-value">{{summary.pendingVerifyIssues}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="glass-card">
+    <view class="section-kicker">Action Deck</view>
+    <view class="section-title sub-title">项目入口</view>
+    <view class="compact-action-grid">
+      <view class="compact-action-card accent-orange" bindtap="goCreate">
+        <view class="action-card-badge">IN</view>
+        <view class="action-card-name">OPL 录入</view>
+        <view class="action-card-note">现场直接提报</view>
+      </view>
+      <view class="compact-action-card accent-slate" bindtap="goIssueList">
+        <view class="action-card-badge">OPL</view>
+        <view class="action-card-name">项目问题库</view>
+        <view class="action-card-note">整项目问题清单</view>
+      </view>
+      <view class="compact-action-card accent-teal" bindtap="goProjectStats">
+        <view class="action-card-badge">STA</view>
+        <view class="action-card-name">项目统计</view>
+        <view class="action-card-note">超期、关闭、风险</view>
+      </view>
+      <view class="compact-action-card accent-blue" bindtap="goTodoIssues">
+        <view class="action-card-badge">TODO</view>
+        <view class="action-card-name">待我处理</view>
+        <view class="action-card-note">个人待办入口</view>
+      </view>
+    </view>
+
+    <view class="compact-strip">
+      <view class="strip-item">
+        <view class="metric-label">高优先级</view>
+        <view class="strip-value">{{summary.highPriorityIssues}}</view>
+      </view>
+      <view class="strip-item">
+        <view class="metric-label">已关闭</view>
+        <view class="strip-value">{{summary.closedIssues}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="glass-card">
+    <view class="section-kicker">Focus Issues</view>
+    <view class="section-title sub-title">重点问题</view>
+    <view wx:if="{{focusIssues.length}}">
+      <view wx:for="{{focusIssues}}" wx:key="id" class="focus-item compact-focus-item" data-index="{{index}}" bindtap="goIssueDetail">
+        <view class="focus-accent accent-{{item.progressTone}}"></view>
+        <view class="focus-body compact-focus-body">
+          <view class="focus-head">
+            <view class="focus-no">{{item.issueNo}}</view>
+            <view class="focus-badge badge-{{item.progressTone}}">{{item.progressLabel}}</view>
+          </view>
+          <view class="focus-title">{{item.title}}</view>
+          <view class="compact-focus-meta">
+            <text>责任人 {{item.ownerName}}</text>
+            <text>截止 {{item.dueText}}</text>
+          </view>
+          <view class="focus-next-row">
+            <view class="focus-next">下一步 {{item.nextActionText}}</view>
+            <view class="focus-enter">查看</view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view wx:else class="empty-card">当前项目暂无重点问题</view>
+  </view>
+</view>

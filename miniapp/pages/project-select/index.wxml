@@ -1,0 +1,59 @@
+<view class="page-shell safe-bottom">
+  <view class="glass-card selector-hero">
+    <view class="hero-copy">
+      <view class="section-kicker">Project First</view>
+      <view class="section-title">先选项目，再进入下级菜单</view>
+      <view class="section-desc">每个项目都拥有独立的问题库和统计视图，先锁定项目，再进入工作台、录入页或统计页。</view>
+    </view>
+
+    <view class="selector-visual">
+      <view class="selector-grid"></view>
+      <view class="selector-beam"></view>
+      <view class="selector-badge badge-a">WORKBENCH</view>
+      <view class="selector-badge badge-b">PROJECT OPS</view>
+      <view class="selector-tower tower-left"></view>
+      <view class="selector-tower tower-right"></view>
+    </view>
+
+    <view class="field-block search-block">
+      <input class="field-input" placeholder="搜索项目编号 / 名称 / 客户" bindinput="onKeywordInput" />
+    </view>
+    <button class="secondary-btn" bindtap="handleSearch">应用搜索</button>
+  </view>
+
+  <view wx:if="{{projects.length}}" class="project-grid">
+    <view wx:for="{{projects}}" wx:key="id" class="glass-card project-card">
+      <view class="project-card-head">
+        <view>
+          <view class="section-kicker">{{item.projectNo}}</view>
+          <view class="project-title">{{item.projectName}}</view>
+        </view>
+        <view class="tag {{item.statusTone}}">{{item.statusLabel}}</view>
+      </view>
+
+      <view class="project-desc">{{item.customerName}} / 项目经理 {{item.projectManagerName || '-'}}</view>
+
+      <view class="project-info-grid">
+        <view class="project-info-item">
+          <view class="metric-label">开始</view>
+          <view class="project-info-value">{{item.startDate || '-'}}</view>
+        </view>
+        <view class="project-info-item">
+          <view class="metric-label">计划结束</view>
+          <view class="project-info-value">{{item.plannedEndDate || '-'}}</view>
+        </view>
+      </view>
+
+      <view class="tag-row project-tags">
+        <view wx:if="{{item.isActive}}" class="tag teal">当前项目</view>
+        <view class="tag gray">{{entryButtonText}}</view>
+      </view>
+
+      <button class="primary-btn project-entry" data-index="{{index}}" bindtap="chooseProject">
+        {{entryButtonText}}
+      </button>
+    </view>
+  </view>
+
+  <view wx:else class="empty-card">{{emptyText}}</view>
+</view>

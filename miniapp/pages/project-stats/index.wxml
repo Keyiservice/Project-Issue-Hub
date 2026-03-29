@@ -1,0 +1,99 @@
+<view class="page-shell safe-bottom">
+  <view class="glass-card stats-hero" wx:if="{{currentProject}}">
+    <view class="stats-hero-head">
+      <view>
+        <view class="section-kicker">Project Stats</view>
+        <view class="section-title">{{currentProject.projectName}}</view>
+        <view class="section-desc">管理层可直接查看当前项目的进度、超期和关闭情况。</view>
+      </view>
+      <view class="stats-hero-actions">
+        <button class="mini-switch-btn" bindtap="switchProject">切换项目</button>
+        <button class="secondary-btn stats-back-btn" bindtap="goProjectHub">返回工作台</button>
+      </view>
+    </view>
+
+    <view class="metric-grid">
+      <view class="metric-card">
+        <view class="metric-label">全部 OPL</view>
+        <view class="metric-value">{{summary.totalIssues}}</view>
+      </view>
+      <view class="metric-card">
+        <view class="metric-label">进行中</view>
+        <view class="metric-value">{{summary.openIssues}}</view>
+      </view>
+      <view class="metric-card">
+        <view class="metric-label">已关闭</view>
+        <view class="metric-value">{{summary.closedIssues}}</view>
+      </view>
+      <view class="metric-card">
+        <view class="metric-label">已超期</view>
+        <view class="metric-value">{{summary.overdueIssues}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="glass-card">
+    <view class="section-kicker">Status Distribution</view>
+    <view class="section-title stats-title">状态分布</view>
+    <view wx:for="{{statusBars}}" wx:key="key" class="bar-item">
+      <view class="bar-head">
+        <view class="bar-label">{{item.label}}</view>
+        <view class="bar-value">{{item.count}} / {{item.percent}}%</view>
+      </view>
+      <view class="bar-track">
+        <view class="bar-fill tone-{{item.tone}}" style="{{item.widthStyle}}"></view>
+      </view>
+    </view>
+  </view>
+
+  <view class="glass-card">
+    <view class="section-kicker">Priority Distribution</view>
+    <view class="section-title stats-title">优先级分布</view>
+    <view wx:for="{{priorityBars}}" wx:key="key" class="bar-item">
+      <view class="bar-head">
+        <view class="bar-label">{{item.label}}</view>
+        <view class="bar-value">{{item.count}} / {{item.percent}}%</view>
+      </view>
+      <view class="bar-track">
+        <view class="bar-fill tone-{{item.tone}}" style="{{item.widthStyle}}"></view>
+      </view>
+    </view>
+  </view>
+
+  <view class="glass-card">
+    <view class="section-kicker">Management Focus</view>
+    <view class="section-title stats-title">重点问题</view>
+    <view wx:if="{{focusIssues.length}}">
+      <view wx:for="{{focusIssues}}" wx:key="id" class="focus-item" data-index="{{index}}" bindtap="goIssueDetail">
+        <view class="focus-accent accent-{{item.progressTone}}"></view>
+        <view class="focus-body">
+          <view class="focus-head">
+            <view class="focus-no">{{item.issueNo}}</view>
+            <view class="focus-badge badge-{{item.progressTone}}">{{item.progressLabel}}</view>
+          </view>
+          <view class="focus-title">{{item.title}}</view>
+
+          <view class="focus-meta-board">
+            <view class="focus-meta-card">
+              <view class="focus-meta-label">责任人</view>
+              <view class="focus-meta-value">{{item.ownerName}}</view>
+            </view>
+            <view class="focus-meta-card">
+              <view class="focus-meta-label">截止</view>
+              <view class="focus-meta-value">{{item.dueText}}</view>
+            </view>
+          </view>
+
+          <view class="focus-next-row">
+            <view>
+              <view class="focus-meta-label">下一步</view>
+              <view class="focus-next">{{item.nextActionText}}</view>
+            </view>
+            <view class="focus-enter">查看详情</view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view wx:else class="empty-card">当前项目暂无重点问题</view>
+  </view>
+</view>

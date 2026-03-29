@@ -1,0 +1,34 @@
+.profile-hero {
+  background:
+    radial-gradient(circle at top right, rgba(35, 95, 167, 0.12), transparent 35%),
+    rgba(255, 252, 247, 0.96);
+}
+
+.profile-tags {
+  margin-top: 18rpx;
+}
+
+.profile-card {
+  display: grid;
+  gap: 16rpx;
+  margin-top: 20rpx;
+}
+
+.security-card {
+  margin-top: 20rpx;
+}
+
+.section-title-small {
+  font-size: 34rpx;
+}
+
+.password-form {
+  margin-top: 20rpx;
+}
+
+.meta-value {
+  margin-top: 8rpx;
+  font-size: 30rpx;
+  color: #17212b;
+  font-weight: 700;
+}

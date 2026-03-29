@@ -1,0 +1,28 @@
+<view class="issue-card" bindtap="onTap">
+  <view class="issue-card-head">
+    <view class="issue-no">
+      {{issue.issueNo}}
+      <text wx:if="{{issue.oplNo}}"> / OPL {{issue.oplNo}}</text>
+    </view>
+    <view class="tag-row">
+      <view class="mini-tag tone-{{priorityTone}}">{{priorityLabel}}</view>
+      <view class="mini-tag tone-{{progressTone}}">{{progressLabel}}</view>
+    </view>
+  </view>
+
+  <view class="issue-title">{{issue.title}}</view>
+
+  <view class="issue-line">
+    <text>录入人 {{issue.reporterName || '-'}}</text>
+    <text>责任人 {{issue.ownerName || '待分派'}}</text>
+  </view>
+
+  <view class="issue-line">
+    <text>录入时间 {{createdText}}</text>
+  </view>
+
+  <view class="issue-foot">
+    <text>下一步 {{nextActionText}}</text>
+    <text wx:if="{{issue.closedAt}}" class="issue-overdue">已关闭</text>
+  </view>
+</view>

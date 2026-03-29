@@ -1,0 +1,5 @@
+账号,项目岗位代码,是否项目经理,可分派,可验证,可关闭,排序,备注
+pm01,PROJECT_MANAGER,Y,Y,Y,Y,0,项目经理
+zhang.peng,MECH_ENGINEER,N,Y,N,N,10,机械负责人
+liu.elec,ELECTRICAL_TECH,N,N,Y,N,20,电气调试
+wang.auto,AUTOMATION_ENGINEER,N,N,N,N,30,自动化支持

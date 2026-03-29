@@ -1,0 +1,83 @@
+<view class="page-shell safe-bottom">
+  <view class="ambient-rig">
+    <view class="ambient-grid"></view>
+    <view class="ambient-glow ambient-glow-left"></view>
+    <view class="ambient-glow ambient-glow-right"></view>
+    <view class="ambient-line ambient-line-top"></view>
+    <view class="ambient-line ambient-line-bottom"></view>
+  </view>
+
+  <view class="glass-card home-top-card command-card">
+    <view class="home-top-head">
+      <view>
+        <view class="section-kicker">Project Issue Hub</view>
+        <view class="section-title home-title">{{currentUser.realName || currentUser.username || 'Project Issue Hub'}}</view>
+      </view>
+      <button class="mini-switch-btn" bindtap="goCurrentProject">进入项目</button>
+    </view>
+
+    <view class="home-chip-row">
+      <view class="home-chip">{{activeProject.projectName || '未选择项目'}}</view>
+      <view class="home-chip">{{currentUser.username || '当前账号'}}</view>
+    </view>
+
+    <view class="home-entry-grid">
+      <view class="home-entry-card entry-strong" bindtap="goProjectHub">
+        <view class="entry-mark">OPS</view>
+        <view class="entry-name">项目工作台</view>
+      </view>
+      <view class="home-entry-card" bindtap="goQuickCreate">
+        <view class="entry-mark">IN</view>
+        <view class="entry-name">OPL 录入</view>
+      </view>
+      <view class="home-entry-card" bindtap="goProjectOpl">
+        <view class="entry-mark">OPL</view>
+        <view class="entry-name">项目问题库</view>
+      </view>
+      <view class="home-entry-card" bindtap="goProjectStats">
+        <view class="entry-mark">STA</view>
+        <view class="entry-name">项目统计</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="glass-card quick-section">
+    <view class="section-kicker">My Workspace</view>
+    <view class="quick-grid">
+      <view class="quick-card" bindtap="goMyIssues">
+        <view class="quick-mark">MY</view>
+        <view class="quick-name">我的问题</view>
+      </view>
+      <view class="quick-card" bindtap="goTodoIssues">
+        <view class="quick-mark">TODO</view>
+        <view class="quick-name">待我处理</view>
+      </view>
+      <view class="quick-card" bindtap="goProfile">
+        <view class="quick-mark">ME</view>
+        <view class="quick-name">个人中心</view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{canViewStats}}" class="glass-card stats-section">
+    <view class="section-kicker">Snapshot</view>
+    <view class="compact-stat-grid">
+      <view class="metric-card compact-stat-card">
+        <view class="metric-label">问题总数</view>
+        <view class="metric-value">{{stats.totalIssues}}</view>
+      </view>
+      <view class="metric-card compact-stat-card">
+        <view class="metric-label">未关闭</view>
+        <view class="metric-value">{{stats.openIssues}}</view>
+      </view>
+      <view class="metric-card compact-stat-card">
+        <view class="metric-label">高优先级</view>
+        <view class="metric-value">{{stats.highPriorityIssues}}</view>
+      </view>
+      <view class="metric-card compact-stat-card">
+        <view class="metric-label">已超期</view>
+        <view class="metric-value">{{stats.overdueIssues}}</view>
+      </view>
+    </view>
+  </view>
+</view>

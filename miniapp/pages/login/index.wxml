@@ -1,0 +1,97 @@
+<view class="page-shell safe-bottom login-shell">
+  <view wx:if="{{networkNotice}}" class="glass-card">
+    <view class="section-kicker">Network Notice</view>
+    <view class="section-desc">{{networkNotice}}</view>
+  </view>
+
+  <view class="glass-card login-hero">
+    <view class="section-kicker">Project Issue Hub</view>
+    <view class="section-title">企业账号绑定式登录</view>
+    <view class="section-desc">
+      账号由管理员预先创建。首次进入小程序先使用微信登录，再绑定企业账号，后续即可微信免密进入。
+    </view>
+  </view>
+
+  <view wx:if="{{mode === 'wechat'}}" class="glass-card login-card">
+    <view class="section-kicker">Step 1</view>
+    <view class="card-title">微信快捷登录</view>
+    <view class="card-desc">用于识别当前微信身份。若尚未绑定企业账号，系统会自动进入绑定流程。</view>
+    <button class="primary-btn" loading="{{loading}}" bindtap="handleWechatLogin">微信登录并检查绑定</button>
+    <view class="tip-card">
+      <view class="tip-title">登录规则</view>
+      <view class="tip-line">1. 管理员先在后台创建账号、角色和项目权限。</view>
+      <view class="tip-line">2. 首次进入需要输入一次企业账号和初始密码完成绑定。</view>
+      <view class="tip-line">3. 若使用初始密码，绑定后会要求立刻修改。</view>
+    </view>
+  </view>
+
+  <view wx:if="{{mode === 'bind'}}" class="glass-card login-card">
+    <view class="section-kicker">Step 2</view>
+    <view class="card-title">绑定企业账号</view>
+    <view class="card-desc">请使用管理员分配的账号和初始密码，将当前微信与企业身份绑定。</view>
+
+    <view class="field-block">
+      <text class="field-label">企业账号</text>
+      <input
+        class="field-input"
+        data-form="bindForm"
+        data-field="username"
+        placeholder="例如：zhang.peng / 工号"
+        value="{{bindForm.username}}"
+        bindinput="onInput"
+      />
+    </view>
+
+    <view class="field-block">
+      <text class="field-label">初始密码</text>
+      <input
+        class="field-input"
+        password
+        data-form="bindForm"
+        data-field="password"
+        placeholder="请输入管理员分配的初始密码"
+        value="{{bindForm.password}}"
+        bindinput="onInput"
+      />
+    </view>
+
+    <button class="primary-btn" loading="{{loading}}" bindtap="handleBind">绑定并进入系统</button>
+    <button class="secondary-btn" bindtap="resetToWechat">返回微信登录</button>
+  </view>
+
+  <view wx:if="{{mode === 'change-password'}}" class="glass-card login-card">
+    <view class="section-kicker">Step 3</view>
+    <view class="card-title">修改初始密码</view>
+    <view class="card-desc">
+      {{currentUser.realName || currentUser.username || '当前账号'}} 已完成绑定。为保证账号安全，请先修改密码。
+    </view>
+
+    <view class="field-block">
+      <text class="field-label">新密码</text>
+      <input
+        class="field-input"
+        password
+        data-form="passwordForm"
+        data-field="newPassword"
+        placeholder="请输入 6-32 位新密码"
+        value="{{passwordForm.newPassword}}"
+        bindinput="onInput"
+      />
+    </view>
+
+    <view class="field-block">
+      <text class="field-label">确认新密码</text>
+      <input
+        class="field-input"
+        password
+        data-form="passwordForm"
+        data-field="confirmPassword"
+        placeholder="请再次输入新密码"
+        value="{{passwordForm.confirmPassword}}"
+        bindinput="onInput"
+      />
+    </view>
+
+    <button class="primary-btn" loading="{{loading}}" bindtap="handleChangePassword">保存新密码并进入</button>
+  </view>
+</view>

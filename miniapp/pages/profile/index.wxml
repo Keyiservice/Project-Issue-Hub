@@ -1,0 +1,82 @@
+<view class="page-shell safe-bottom">
+  <view class="glass-card profile-hero">
+    <view class="section-kicker">Profile</view>
+    <view class="section-title">{{currentUser.realName || currentUser.username || '未登录用户'}}</view>
+    <view class="section-desc">{{currentUser.departmentName || '未设置部门'}}</view>
+    <view class="tag-row profile-tags">
+      <view wx:for="{{currentUser.roles || []}}" wx:key="*this" class="tag blue">{{item}}</view>
+    </view>
+  </view>
+
+  <view class="glass-card profile-card">
+    <view class="metric-card">
+      <view class="metric-label">账号</view>
+      <view class="meta-value">{{currentUser.username || '-'}}</view>
+    </view>
+    <view class="metric-card">
+      <view class="metric-label">微信绑定</view>
+      <view class="meta-value">{{currentUser.wechatBound ? '已绑定' : '未绑定'}}</view>
+    </view>
+    <view class="metric-card">
+      <view class="metric-label">密码状态</view>
+      <view class="meta-value">{{currentUser.passwordChangeRequired ? '需修改初始密码' : '已完成更新'}}</view>
+    </view>
+    <view class="metric-card">
+      <view class="metric-label">版本</view>
+      <view class="meta-value">{{version}}</view>
+    </view>
+  </view>
+
+  <view class="glass-card security-card">
+    <view class="section-kicker">Security</view>
+    <view class="section-title section-title-small">账号安全</view>
+    <view class="section-desc">
+      {{currentUser.passwordChangeRequired ? '当前账号仍在使用初始密码，请先完成更新。' : '可随时修改密码。'}}
+    </view>
+    <button class="primary-btn" bindtap="togglePasswordForm">
+      {{passwordFormVisible ? '收起改密表单' : '修改密码'}}
+    </button>
+
+    <view wx:if="{{passwordFormVisible}}" class="password-form">
+      <view wx:if="{{!currentUser.passwordChangeRequired}}" class="field-block">
+        <text class="field-label">旧密码</text>
+        <input
+          class="field-input"
+          password
+          data-field="oldPassword"
+          value="{{passwordForm.oldPassword}}"
+          placeholder="请输入当前密码"
+          bindinput="onInput"
+        />
+      </view>
+
+      <view class="field-block">
+        <text class="field-label">新密码</text>
+        <input
+          class="field-input"
+          password
+          data-field="newPassword"
+          value="{{passwordForm.newPassword}}"
+          placeholder="请输入 6-32 位新密码"
+          bindinput="onInput"
+        />
+      </view>
+
+      <view class="field-block">
+        <text class="field-label">确认新密码</text>
+        <input
+          class="field-input"
+          password
+          data-field="confirmPassword"
+          value="{{passwordForm.confirmPassword}}"
+          placeholder="请再次输入新密码"
+          bindinput="onInput"
+        />
+      </view>
+
+      <button class="secondary-btn" loading="{{submitting}}" bindtap="submitPasswordChange">保存新密码</button>
+    </view>
+  </view>
+
+  <button class="secondary-btn" bindtap="logout">退出登录</button>
+</view>

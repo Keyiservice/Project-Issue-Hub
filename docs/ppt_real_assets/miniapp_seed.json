@@ -1,0 +1,20 @@
+{
+  "token": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsInVzZXJJZCI6MSwicmVhbE5hbWUiOiJTeXN0ZW0gQWRtaW4iLCJkZXBhcnRtZW50Q29kZSI6IklUIiwiZGVwYXJ0bWVudE5hbWUiOiJJVCIsInJvbGVzIjpbIkFETUlOIl0sImlhdCI6MTc3NDQ0Njk5MiwiZXhwIjoxNzc0NDkwMTkyfQ.eUNbdnr8d98laGAkW1srIfFqsoSwA67xlmQIpryx2diuHW4WqOggD7eTBVLYESFD",
+  "currentUser": {
+    "userId": 1,
+    "username": "admin",
+    "realName": "System Admin",
+    "departmentCode": "IT",
+    "departmentName": "IT",
+    "roles": [
+      "ADMIN"
+    ],
+    "wechatBound": false,
+    "passwordChangeRequired": false
+  },
+  "activeProject": {
+    "id": 6,
+    "projectName": "FS21"
+  },
+  "issueId": 198
+}
