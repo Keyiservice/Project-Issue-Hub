@@ -317,7 +317,7 @@ public class IssueServiceImpl extends ServiceImpl<IssueMapper, Issue> implements
         vo.setCommentId(attachment.getCommentId());
         vo.setFileName(attachment.getFileName());
         vo.setObjectKey(attachment.getObjectKey());
-        vo.setFileUrl(fileStorageService.getPreviewUrl(attachment.getBucketName(), attachment.getObjectKey()));
+        vo.setFileUrl("/api/attachments/" + attachment.getId() + "/content");
         vo.setFileType(attachment.getFileType());
         vo.setContentType(attachment.getContentType());
         vo.setFileSize(attachment.getFileSize());

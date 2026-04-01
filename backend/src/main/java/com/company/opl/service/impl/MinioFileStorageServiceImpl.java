@@ -62,8 +62,8 @@ public class MinioFileStorageServiceImpl implements FileStorageService {
                     file.getContentType()
             );
         } catch (Exception ex) {
-            log.error("上传文件失败", ex);
-            throw new IllegalStateException("上传文件失败: " + ex.getMessage(), ex);
+            log.error("涓婁紶鏂囦欢澶辫触", ex);
+            throw new IllegalStateException("涓婁紶鏂囦欢澶辫触: " + ex.getMessage(), ex);
         }
     }
 
@@ -82,15 +82,15 @@ public class MinioFileStorageServiceImpl implements FileStorageService {
                             .build()
             );
         } catch (Exception ex) {
-            log.error("生成附件预览地址失败, bucket={}, objectKey={}", bucketName, objectKey, ex);
-            throw new IllegalStateException("生成附件预览地址失败", ex);
+            log.error("鐢熸垚闄勪欢棰勮鍦板潃澶辫触, bucket={}, objectKey={}", bucketName, objectKey, ex);
+            return null;
         }
     }
 
     @Override
     public StoredFileContent load(String bucketName, String objectKey) {
         if (!StringUtils.hasText(bucketName) || !StringUtils.hasText(objectKey)) {
-            throw new IllegalArgumentException("bucketName 和 objectKey 不能为空");
+            throw new IllegalArgumentException("bucketName 鍜?objectKey 涓嶈兘涓虹┖");
         }
         try (InputStream inputStream = minioClient.getObject(GetObjectArgs.builder()
                 .bucket(bucketName)
@@ -100,8 +100,8 @@ public class MinioFileStorageServiceImpl implements FileStorageService {
             inputStream.transferTo(outputStream);
             return new StoredFileContent(outputStream.toByteArray(), null);
         } catch (Exception ex) {
-            log.error("读取附件内容失败, bucket={}, objectKey={}", bucketName, objectKey, ex);
-            throw new IllegalStateException("读取附件内容失败", ex);
+            log.error("璇诲彇闄勪欢鍐呭澶辫触, bucket={}, objectKey={}", bucketName, objectKey, ex);
+            return null;
         }
     }
 
@@ -134,3 +134,4 @@ public class MinioFileStorageServiceImpl implements FileStorageService {
                 : properties.getEndpoint();
     }
 }
+

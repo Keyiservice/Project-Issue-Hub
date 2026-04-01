@@ -149,7 +149,7 @@ public class IssueCommentServiceImpl implements IssueCommentService {
         vo.setCommentId(attachment.getCommentId());
         vo.setFileName(attachment.getFileName());
         vo.setObjectKey(attachment.getObjectKey());
-        vo.setFileUrl(attachment.getFileUrl());
+        vo.setFileUrl("/api/attachments/" + attachment.getId() + "/content");
         vo.setFileType(attachment.getFileType());
         vo.setContentType(attachment.getContentType());
         vo.setFileSize(attachment.getFileSize());
