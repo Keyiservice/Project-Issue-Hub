@@ -20,6 +20,7 @@ export interface IssueItem {
   title: string
   projectId?: number
   projectName: string
+  issueFunctionCode?: string
   priority: string
   status: string
   pilotName?: string

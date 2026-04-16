@@ -152,6 +152,10 @@
         <view class="metric-label">截止时间</view>
         <view class="meta-value">{{detail.dueText || '-'}}</view>
       </view>
+      <view class="metric-card">
+        <view class="metric-label">问题属性</view>
+        <view class="meta-value">{{detail.issueFunctionLabel || '-'}}</view>
+      </view>
     </view>
   </view>
 

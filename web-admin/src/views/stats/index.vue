@@ -2,7 +2,7 @@
   <div class="stats-page">
     <section class="opl-page-head">
       <div>
-        <p class="opl-section-title">Statistics</p>
+        <p class="opl-section-title">{{ t('stats.title') }}</p>
         <h2 class="opl-page-title">{{ pageTitle }}</h2>
       </div>
 
@@ -12,7 +12,7 @@
           clearable
           filterable
           class="project-select"
-          placeholder="全部项目"
+          :placeholder="t('stats.allProjects')"
           @change="handleProjectChange"
           @clear="handleProjectClear"
         >
@@ -30,34 +30,34 @@
       <el-card class="project-hero">
         <div class="project-head">
           <div>
-            <p class="opl-section-title">Current Project</p>
+            <p class="opl-section-title">{{ t('stats.currentProject') }}</p>
             <h3 class="opl-card-title">{{ activeProject.projectName }}</h3>
             <div class="opl-inline-meta">
               <span>{{ activeProject.projectNo }}</span>
-              <span v-if="activeProject.customerName">客户 {{ activeProject.customerName }}</span>
-              <span v-if="activeProject.projectManagerName">项目经理 {{ activeProject.projectManagerName }}</span>
+              <span v-if="activeProject.customerName">{{ t('common.label.customer') }} {{ activeProject.customerName }}</span>
+              <span v-if="activeProject.projectManagerName">{{ t('common.label.projectManager') }} {{ activeProject.projectManagerName }}</span>
             </div>
           </div>
-          <span class="opl-chip orange">{{ activeProject.status || '进行中' }}</span>
+          <span class="opl-chip orange">{{ activeProject.status || '-' }}</span>
         </div>
       </el-card>
 
       <el-card>
         <div class="scope-panel">
           <div class="scope-metric">
-            <span class="opl-kv-label">统计口径</span>
-            <strong class="scope-value">当前项目</strong>
+            <span class="opl-kv-label">{{ t('stats.scope') }}</span>
+            <strong class="scope-value">{{ t('stats.currentProject') }}</strong>
           </div>
           <div class="scope-metric">
-            <span class="opl-kv-label">闭环率</span>
+            <span class="opl-kv-label">{{ t('stats.closeRate') }}</span>
             <strong class="scope-value">{{ closeRate }}%</strong>
           </div>
           <div class="scope-metric">
-            <span class="opl-kv-label">高优先级占比</span>
+            <span class="opl-kv-label">{{ t('stats.highPriorityRate') }}</span>
             <strong class="scope-value">{{ highPriorityRate }}%</strong>
           </div>
           <div class="scope-metric">
-            <span class="opl-kv-label">超期占比</span>
+            <span class="opl-kv-label">{{ t('stats.overdueRate') }}</span>
             <strong class="scope-value">{{ overdueRate }}%</strong>
           </div>
         </div>
@@ -68,14 +68,14 @@
       <el-card>
         <div class="overview-head">
           <div>
-            <p class="opl-section-title">Scope</p>
-            <h3 class="opl-card-title">全部项目总览</h3>
+            <p class="opl-section-title">{{ t('stats.scope') }}</p>
+            <h3 class="opl-card-title">{{ t('stats.globalOverview') }}</h3>
           </div>
           <div class="overview-chips">
-            <span class="opl-chip slate">全项目</span>
-            <span class="opl-chip teal">闭环率 {{ closeRate }}%</span>
-            <span class="opl-chip amber">高优先级 {{ highPriorityRate }}%</span>
-            <span class="opl-chip rose">超期 {{ overdueRate }}%</span>
+            <span class="opl-chip slate">{{ t('stats.allProjectChip') }}</span>
+            <span class="opl-chip teal">{{ t('stats.closeRate') }} {{ closeRate }}%</span>
+            <span class="opl-chip amber">{{ t('stats.highPriorityRate') }} {{ highPriorityRate }}%</span>
+            <span class="opl-chip rose">{{ t('stats.overdueRate') }} {{ overdueRate }}%</span>
           </div>
         </div>
       </el-card>
@@ -94,7 +94,7 @@
         <template #header>
           <div class="chart-head">
             <div>
-              <h3 class="opl-card-title">新增 / 关闭趋势</h3>
+              <h3 class="opl-card-title">{{ t('stats.trendTitle') }}</h3>
               <div class="chart-subtitle">{{ chartSubtitle }}</div>
             </div>
           </div>
@@ -106,7 +106,7 @@
         <template #header>
           <div class="chart-head">
             <div>
-              <h3 class="opl-card-title">问题结构</h3>
+              <h3 class="opl-card-title">{{ t('stats.structureTitle') }}</h3>
               <div class="chart-subtitle">{{ structureSubtitle }}</div>
             </div>
           </div>
@@ -119,10 +119,12 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import * as echarts from 'echarts'
 import { fetchDashboardStats, type DashboardStats } from '@/api/stats'
 import { fetchProjectAll, type ProjectItem } from '@/api/project'
 
+const { t } = useI18n()
 const trendChartRef = ref<HTMLDivElement>()
 const structureChartRef = ref<HTMLDivElement>()
 let trendChart: echarts.ECharts | null = null
@@ -145,7 +147,7 @@ const activeProject = computed(() =>
 )
 
 const pageTitle = computed(() =>
-  activeProject.value ? `${activeProject.value.projectName} 统计分析` : '统计分析'
+  activeProject.value ? `${activeProject.value.projectName} / ${t('stats.title')}` : t('stats.title')
 )
 
 const closedIssues = computed(() => Math.max(stats.value.totalIssues - stats.value.openIssues, 0))
@@ -171,37 +173,37 @@ const overdueRate = computed(() => {
   return Math.round((stats.value.overdueIssues / stats.value.totalIssues) * 100)
 })
 
-const scopeText = computed(() => (activeProject.value ? '当前项目口径' : '全部项目口径'))
+const scopeText = computed(() => (activeProject.value ? t('stats.currentProject') : t('stats.allProjects')))
 
 const statCards = computed(() => [
   {
-    label: '问题总数',
+    label: t('stats.totalIssues'),
     value: stats.value.totalIssues,
-    note: `${scopeText.value}下全部问题`
+    note: t('stats.notes.totalIssues', { scope: scopeText.value })
   },
   {
-    label: '未关闭',
+    label: t('stats.openIssues'),
     value: stats.value.openIssues,
-    note: '新建、处理中、待验证、挂起'
+    note: t('stats.notes.openIssues')
   },
   {
-    label: '高优先级',
+    label: t('stats.highPriorityIssues'),
     value: stats.value.highPriorityIssues,
-    note: 'HIGH / CRITICAL 且未关闭'
+    note: t('stats.notes.highPriorityIssues')
   },
   {
-    label: '已超期',
+    label: t('stats.overdueIssues'),
     value: stats.value.overdueIssues,
-    note: '超过截止时间且未关闭'
+    note: t('stats.notes.overdueIssues')
   }
 ])
 
 const chartSubtitle = computed(() =>
-  activeProject.value ? `${activeProject.value.projectName} 最近 7 天` : '全部项目最近 7 天'
+  activeProject.value ? `${activeProject.value.projectName} / ${t('stats.recent7Days')}` : `${t('stats.allProjects')} / ${t('stats.recent7Days')}`
 )
 
 const structureSubtitle = computed(() =>
-  activeProject.value ? `${activeProject.value.projectName} 当前结构` : '全部项目当前结构'
+  activeProject.value ? `${activeProject.value.projectName} / ${t('stats.currentStructure')}` : `${t('stats.allProjects')} / ${t('stats.currentStructure')}`
 )
 
 function renderTrendChart() {
@@ -245,7 +247,7 @@ function renderTrendChart() {
     },
     series: [
       {
-        name: '新增',
+        name: t('stats.created'),
         type: 'line',
         smooth: true,
         symbolSize: 8,
@@ -259,7 +261,7 @@ function renderTrendChart() {
         data: stats.value.createdTrend
       },
       {
-        name: '关闭',
+        name: t('stats.closed'),
         type: 'line',
         smooth: true,
         symbolSize: 8,
@@ -309,10 +311,10 @@ function renderStructureChart() {
           formatter: '{b}\n{c}'
         },
         data: [
-          { value: closedIssues.value, name: '已关闭' },
-          { value: stats.value.openIssues, name: '未关闭' },
-          { value: stats.value.highPriorityIssues, name: '高优先级' },
-          { value: stats.value.overdueIssues, name: '已超期' }
+          { value: closedIssues.value, name: t('stats.closedIssues') },
+          { value: stats.value.openIssues, name: t('stats.openIssues') },
+          { value: stats.value.highPriorityIssues, name: t('stats.highPriority') },
+          { value: stats.value.overdueIssues, name: t('stats.overdue') }
         ]
       }
     ]
@@ -376,13 +378,6 @@ onBeforeUnmount(() => {
   width: 260px;
 }
 
-.project-hero {
-  background:
-    radial-gradient(circle at left top, rgba(203, 93, 31, 0.12), transparent 28%),
-    radial-gradient(circle at right top, rgba(15, 118, 110, 0.14), transparent 32%),
-    linear-gradient(145deg, rgba(255, 251, 246, 0.94), rgba(255, 255, 255, 0.82));
-}
-
 .project-head,
 .overview-head {
   display: flex;
@@ -394,36 +389,20 @@ onBeforeUnmount(() => {
 .scope-panel {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-}
-
-.scope-metric {
-  padding: 16px 18px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(24, 33, 43, 0.06);
+  gap: 18px;
 }
 
 .scope-value {
   display: block;
-  margin-top: 10px;
+  margin-top: 8px;
   font-size: 24px;
   color: var(--opl-text);
 }
 
 .overview-chips {
   display: flex;
-  flex-wrap: wrap;
   gap: 10px;
-  justify-content: flex-end;
-}
-
-.card-note,
-.chart-subtitle {
-  margin-top: 8px;
-  color: var(--opl-muted);
-  font-size: 13px;
-  line-height: 1.7;
+  flex-wrap: wrap;
 }
 
 .analysis-grid {
@@ -434,23 +413,20 @@ onBeforeUnmount(() => {
   height: 360px;
 }
 
+.chart-subtitle,
+.card-note {
+  color: var(--opl-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
 @media (max-width: 960px) {
-  .project-select {
-    width: 100%;
-  }
-
-  .project-head,
-  .overview-head {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .overview-chips {
-    justify-content: flex-start;
-  }
-
   .scope-panel {
     grid-template-columns: 1fr;
+  }
+
+  .project-select {
+    width: 100%;
   }
 }
 </style>

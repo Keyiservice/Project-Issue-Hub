@@ -15,5 +15,6 @@ public class CurrentUserVO {
     private String departmentName;
     private Boolean wechatBound;
     private Boolean passwordChangeRequired;
+    private Boolean mfaEnabled;
     private List<String> roles;
 }

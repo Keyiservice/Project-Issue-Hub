@@ -3,10 +3,10 @@
     <section class="opl-page-head">
       <div>
         <p class="opl-section-title">Project Registry</p>
-        <h2 class="opl-page-title">项目管理</h2>
+        <h2 class="opl-page-title">{{ t('page.projects') }}</h2>
       </div>
       <div v-if="canManageProjects" class="opl-page-head-actions">
-        <el-button type="primary" @click="openCreateDialog">新建项目</el-button>
+        <el-button type="primary" @click="openCreateDialog">{{ t('project.newProject') }}</el-button>
       </div>
     </section>
 
@@ -21,11 +21,11 @@
     <el-card>
       <div class="toolbar">
         <el-form :model="query" class="filter-grid" @submit.prevent>
-          <el-form-item label="关键词">
-            <el-input v-model="query.keyword" placeholder="项目编号 / 项目名称 / 客户" clearable />
+          <el-form-item :label="t('common.label.keyword')">
+            <el-input v-model="query.keyword" :placeholder="t('project.searchKeywordPlaceholder')" clearable />
           </el-form-item>
-          <el-form-item label="项目状态">
-            <el-select v-model="query.status" placeholder="全部状态" clearable>
+          <el-form-item :label="t('common.label.status')">
+            <el-select v-model="query.status" :placeholder="t('issueList.allStatus')" clearable>
               <el-option
                 v-for="item in projectStatusOptions"
                 :key="item.value"
@@ -37,8 +37,8 @@
         </el-form>
 
         <div class="toolbar-actions">
-          <el-button type="primary" @click="handleSearch">查询</el-button>
-          <el-button @click="resetQuery">重置</el-button>
+          <el-button type="primary" @click="handleSearch">{{ t('common.action.search') }}</el-button>
+          <el-button @click="resetQuery">{{ t('common.action.reset') }}</el-button>
         </div>
       </div>
     </el-card>
@@ -46,13 +46,13 @@
     <el-card>
       <div class="table-head">
         <div>
-          <h3 class="opl-card-title">项目列表</h3>
+          <h3 class="opl-card-title">{{ t('project.projectList') }}</h3>
         </div>
-        <span class="table-caption">共 {{ total }} 个项目</span>
+        <span class="table-caption">{{ t('project.projectCountLabel', { count: total }) }}</span>
       </div>
 
       <el-table :data="list">
-        <el-table-column label="项目" min-width="280">
+        <el-table-column :label="t('common.label.project')" min-width="280">
           <template #default="{ row }">
             <div class="project-main">
               <div class="project-no">{{ row.projectNo }}</div>
@@ -61,32 +61,32 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="项目经理" min-width="120" prop="projectManagerName" />
-        <el-table-column label="团队人数" width="100" align="center">
+        <el-table-column :label="t('common.label.projectManager')" min-width="120" prop="projectManagerName" />
+        <el-table-column :label="t('common.label.teamSize')" width="100" align="center">
           <template #default="{ row }">
             <span class="member-count">{{ row.teamSize || 0 }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="状态" width="120">
+        <el-table-column :label="t('common.label.status')" width="120">
           <template #default="{ row }">
             <el-tag :type="getProjectStatusMeta(row.status).tagType">
               {{ getProjectStatusMeta(row.status).label }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="计划结束" width="140" prop="plannedEndDate" />
-        <el-table-column label="操作" width="280" fixed="right">
+        <el-table-column :label="t('common.label.plannedEndDate')" width="140" prop="plannedEndDate" />
+        <el-table-column :label="t('common.actionLabel')" width="280" fixed="right">
           <template #default="{ row }">
             <div class="row-actions">
-              <el-button link type="primary" @click="enterIssueLibrary(row.id)">问题库</el-button>
-              <el-button link @click="openMemberDrawer(row)">项目团队</el-button>
+              <el-button link type="primary" @click="enterIssueLibrary(row.id)">{{ t('project.issueLibrary') }}</el-button>
+              <el-button link @click="openMemberDrawer(row)">{{ t('project.projectTeam') }}</el-button>
               <el-button
                 v-if="canManageProjects"
                 link
                 type="danger"
                 @click="removeProject(row)"
               >
-                删除
+                {{ t('common.action.delete') }}
               </el-button>
             </div>
           </template>
@@ -105,23 +105,23 @@
     </el-card>
   </div>
 
-  <el-dialog v-model="dialogVisible" title="新建项目" width="760px">
+  <el-dialog v-model="dialogVisible" :title="t('project.newProject')" width="760px">
     <el-form :model="form" label-position="top" class="dialog-grid">
-      <el-form-item label="项目编号">
+      <el-form-item :label="t('project.projectNo')">
         <el-input v-model="form.projectNo" placeholder="例如 NSD-2026-001" />
       </el-form-item>
-      <el-form-item label="项目名称">
+      <el-form-item :label="t('project.projectName')">
         <el-input v-model="form.projectName" placeholder="请输入项目名称" />
       </el-form-item>
-      <el-form-item label="客户名称">
+      <el-form-item :label="t('project.customerName')">
         <el-input v-model="form.customerName" placeholder="请输入客户名称" />
       </el-form-item>
-      <el-form-item label="项目经理">
-        <el-select v-model="form.projectManagerId" placeholder="请选择项目经理" filterable @change="handleManagerChange">
+      <el-form-item :label="t('common.label.projectManager')">
+        <el-select v-model="form.projectManagerId" :placeholder="t('project.managerRequired')" filterable @change="handleManagerChange">
           <el-option v-for="user in userOptions" :key="user.id" :label="user.realName" :value="user.id" />
         </el-select>
       </el-form-item>
-      <el-form-item label="项目状态">
+      <el-form-item :label="t('common.label.status')">
         <el-select v-model="form.status">
           <el-option
             v-for="item in projectStatusOptions.slice(0, 3)"
@@ -131,19 +131,19 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="开始日期">
-        <el-date-picker v-model="form.startDate" type="date" value-format="YYYY-MM-DD" placeholder="请选择开始日期" />
+      <el-form-item :label="t('common.label.startDate')">
+        <el-date-picker v-model="form.startDate" type="date" value-format="YYYY-MM-DD" :placeholder="t('common.label.startDate')" />
       </el-form-item>
-      <el-form-item label="计划结束">
-        <el-date-picker v-model="form.plannedEndDate" type="date" value-format="YYYY-MM-DD" placeholder="请选择计划结束" />
+      <el-form-item :label="t('common.label.plannedEndDate')">
+        <el-date-picker v-model="form.plannedEndDate" type="date" value-format="YYYY-MM-DD" :placeholder="t('common.label.plannedEndDate')" />
       </el-form-item>
-      <el-form-item label="项目说明" class="full-span">
+      <el-form-item :label="t('common.label.description')" class="full-span">
         <el-input v-model="form.description" type="textarea" :rows="4" placeholder="补充项目背景和交付节点" />
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button @click="dialogVisible = false">取消</el-button>
-      <el-button type="primary" @click="submitCreate">创建项目</el-button>
+      <el-button @click="dialogVisible = false">{{ t('common.action.cancel') }}</el-button>
+      <el-button type="primary" @click="submitCreate">{{ t('project.createProject') }}</el-button>
     </template>
   </el-dialog>
 
@@ -290,6 +290,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   createProject,
@@ -310,11 +311,12 @@ import {
 } from '@/api/project'
 import { fetchUserOptions, type UserOption } from '@/api/user'
 import { useAuthStore } from '@/stores/auth'
-import { getProjectStatusMeta, projectStatusOptions } from '@/utils/view-mappers'
+import { getProjectStatusMeta, getProjectStatusOptions } from '@/utils/view-mappers'
 
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const { t } = useI18n()
 
 const list = ref<ProjectItem[]>([])
 const total = ref(0)
@@ -336,6 +338,8 @@ const query = reactive({
   keyword: '',
   status: ''
 })
+
+const projectStatusOptions = computed(() => getProjectStatusOptions())
 
 const form = reactive({
   projectNo: '',
@@ -371,10 +375,10 @@ const summaryCards = computed(() => {
   const progressCount = list.value.filter((item) => item.status === 'IN_PROGRESS').length
   const totalTeamSize = list.value.reduce((sum, item) => sum + (item.teamSize || 0), 0)
   return [
-    { label: '当前项目', value: list.value.length, note: '当前筛选范围内的项目数量' },
-    { label: '进行中', value: progressCount, note: '正在推进的问题项目' },
-    { label: '规划中', value: planningCount, note: '尚未进入交付节奏的项目' },
-    { label: '团队成员', value: totalTeamSize, note: '已配置到项目内的成员数' }
+    { label: t('project.totalProjects'), value: list.value.length, note: t('project.notes.totalProjects') },
+    { label: t('project.inProgress'), value: progressCount, note: t('project.notes.inProgress') },
+    { label: t('project.planning'), value: planningCount, note: t('project.notes.planning') },
+    { label: t('project.teamMembers'), value: totalTeamSize, note: t('project.notes.teamMembers') }
   ]
 })
 
@@ -453,7 +457,7 @@ async function removeProject(project: ProjectItem) {
     }
   )
   await deleteProject(project.id)
-  ElMessage.success('项目已删除')
+  ElMessage.success(t('project.deleted'))
   if (activeProject.value?.id === project.id) {
     memberDrawerVisible.value = false
     activeProject.value = undefined
@@ -467,7 +471,7 @@ async function removeProject(project: ProjectItem) {
 
 async function submitCreate() {
   if (!form.projectManagerId) {
-    ElMessage.warning('请选择项目经理')
+    ElMessage.warning(t('project.managerRequired'))
     return
   }
   const manager = userOptions.value.find((item) => item.id === form.projectManagerId)
@@ -477,7 +481,7 @@ async function submitCreate() {
     projectManagerId: Number(form.projectManagerId),
     projectManagerName: form.projectManagerName
   })
-  ElMessage.success('项目已创建')
+  ElMessage.success(t('project.created'))
   dialogVisible.value = false
   Object.assign(form, {
     projectNo: '',

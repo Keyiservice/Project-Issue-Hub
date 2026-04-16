@@ -11,6 +11,9 @@ public class LoginVO {
     private Boolean bound;
     private Boolean wechatBound;
     private Boolean passwordChangeRequired;
+    private Boolean mfaRequired;
+    private Boolean mfaSetupRequired;
+    private String mfaToken;
     private Long userId;
     private String username;
     private String realName;

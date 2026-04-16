@@ -44,6 +44,16 @@
 
       <button class="secondary-btn search-button" bindtap="handleSearch">应用筛选</button>
 
+      <view class="owner-filter">
+        <view class="metric-label">问题属性</view>
+        <picker mode="selector" range="{{functionOptions}}" range-key="label" value="{{functionIndex}}" bindchange="onFunctionChange">
+          <view class="picker-field">
+            <text class="picker-text">{{functionLabel}}</text>
+            <text class="picker-arrow">切换</text>
+          </view>
+        </picker>
+      </view>
+
       <view class="chip-row">
         <view
           wx:for="{{statusTabs}}"

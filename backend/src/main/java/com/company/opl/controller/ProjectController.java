@@ -7,6 +7,7 @@ import com.company.opl.dto.project.ProjectUpdateDTO;
 import com.company.opl.query.issue.IssueQuery;
 import com.company.opl.query.project.ProjectQuery;
 import com.company.opl.service.ProjectService;
+import com.company.opl.vo.project.ProjectIssueImportResultVO;
 import com.company.opl.vo.project.ProjectIssueSummaryVO;
 import com.company.opl.vo.project.ProjectVO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,7 +23,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -69,6 +72,14 @@ public class ProjectController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(content);
+    }
+
+    @PostMapping(path = "/{projectId}/issue-report/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAnyRole('SITE_USER','RESP_ENGINEER','PROJECT_MANAGER','ADMIN')")
+    @Operation(summary = "导入项目问题报告")
+    public Result<ProjectIssueImportResultVO> importIssueReport(@PathVariable Long projectId,
+                                                                @RequestParam("file") MultipartFile file) {
+        return Result.success(projectService.importIssueReport(projectId, file));
     }
 
     @PostMapping

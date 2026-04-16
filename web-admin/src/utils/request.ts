@@ -1,7 +1,8 @@
 import axios from 'axios'
-import type { AxiosRequestConfig } from 'axios'
+import type { AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios'
 import { ElMessage } from 'element-plus'
 import type { Result } from '@/types/api'
+import i18n from '@/i18n'
 
 const service = axios.create({
   baseURL: '/api',
@@ -24,27 +25,22 @@ function redirectToLogin(message: string) {
   }
 }
 
-service.interceptors.request.use((config) => {
+function attachToken(config: InternalAxiosRequestConfig) {
   const token = localStorage.getItem('opl_token')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
   return config
-})
+}
 
-binaryService.interceptors.request.use((config) => {
-  const token = localStorage.getItem('opl_token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
-})
+service.interceptors.request.use(attachToken)
+binaryService.interceptors.request.use(attachToken)
 
 service.interceptors.response.use(
   (response) => {
     const result = response.data as Result<unknown>
     if (result.code === 401) {
-      redirectToLogin(result.message || '未认证或认证已过期')
+      redirectToLogin(result.message || i18n.global.t('common.message.unauthorized').toString())
       return Promise.reject(result)
     }
     if (result.code !== 0) {
@@ -55,9 +51,9 @@ service.interceptors.response.use(
   },
   (error) => {
     const status = error?.response?.status
-    const message = error?.response?.data?.message || '网络异常'
+    const message = error?.response?.data?.message || i18n.global.t('common.message.networkError').toString()
     if (status === 401) {
-      redirectToLogin(message || '未认证或认证已过期')
+      redirectToLogin(message || i18n.global.t('common.message.unauthorized').toString())
       return Promise.reject(error)
     }
     ElMessage.error(message)

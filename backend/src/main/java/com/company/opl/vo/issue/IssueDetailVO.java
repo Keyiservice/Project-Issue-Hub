@@ -23,6 +23,7 @@ public class IssueDetailVO {
     private String projectName;
     private String deviceName;
     private String moduleName;
+    private String issueFunctionCode;
     private String categoryCode;
     private String sourceCode;
     private String priority;

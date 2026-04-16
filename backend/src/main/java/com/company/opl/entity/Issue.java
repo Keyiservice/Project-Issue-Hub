@@ -30,6 +30,7 @@ public class Issue extends BaseEntity {
     private String projectName;
     private String deviceName;
     private String moduleName;
+    private String issueFunctionCode;
     private String categoryCode;
     private String sourceCode;
     private String priority;

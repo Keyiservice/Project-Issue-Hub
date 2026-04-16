@@ -113,7 +113,7 @@
         </div>
 
         <div class="summary-grid">
-          <div v-for="item in summaryFacts" :key="item.label" class="opl-kv">
+          <div v-for="item in summaryFactsView" :key="item.label" class="opl-kv">
             <span class="opl-kv-label">{{ item.label }}</span>
             <span class="opl-kv-value">{{ item.value }}</span>
           </div>
@@ -205,6 +205,28 @@
                   <el-input v-model="assignForm.remark" type="textarea" :rows="3" placeholder="补充分派原因" />
                 </el-form-item>
                 <el-button type="primary" @click="submitAssign">保存责任人</el-button>
+              </el-form>
+            </section>
+
+            <section class="action-panel">
+              <div class="panel-head">
+                <span class="panel-title">{{ t('issueDetail.functionPanel') }}</span>
+              </div>
+              <el-form :model="functionForm" label-position="top">
+                <el-form-item :label="t('common.label.issueFunction')">
+                  <el-select v-model="functionForm.issueFunctionCode" :placeholder="t('issueList.selectFunction')">
+                    <el-option v-for="item in issueFunctionOptions" :key="item.value" :label="item.label" :value="item.value" />
+                  </el-select>
+                </el-form-item>
+                <el-form-item :label="t('issueDetail.functionRemark')">
+                  <el-input
+                    v-model="functionForm.remark"
+                    type="textarea"
+                    :rows="3"
+                    :placeholder="t('issueDetail.functionRemarkPlaceholder')"
+                  />
+                </el-form-item>
+                <el-button type="primary" @click="submitFunction">{{ t('issueDetail.updateFunction') }}</el-button>
               </el-form>
             </section>
 
@@ -393,6 +415,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox, type UploadProps, type UploadRequestOptions, type UploadUserFile } from 'element-plus'
 import {
   appendIssueAttachments,
@@ -406,12 +429,13 @@ import {
   uploadIssueAttachment,
   type FileUploadResult,
   type IssueAttachmentPayload,
+  updateIssueFunction,
   updateIssuePriority,
   type IssueAttachmentItem,
   type IssueDetail
 } from '@/api/issue'
 import { fetchProjectMembers, type ProjectMemberItem } from '@/api/project'
-import { getIssuePriorityMeta, getIssueStatusMeta, issuePriorityOptions } from '@/utils/view-mappers'
+import { getIssueFunctionMeta, getIssueFunctionOptions, getIssuePriorityMeta, getIssueStatusMeta, getIssuePriorityOptions } from '@/utils/view-mappers'
 
 type ProgressAction = {
   value: string
@@ -420,6 +444,7 @@ type ProgressAction = {
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 const detail = ref<IssueDetail>()
 const memberOptions = ref<ProjectMemberItem[]>([])
 const previewVisible = ref(false)
@@ -439,9 +464,16 @@ const previewDragStart = reactive({
 const supplementFileList = ref<UploadUserFile[]>([])
 const supplementAttachments = ref<IssueAttachmentPayload[]>([])
 const appendingAttachments = ref(false)
+const issuePriorityOptions = computed(() => getIssuePriorityOptions())
+const issueFunctionOptions = computed(() => getIssueFunctionOptions())
 
 const assignForm = reactive({
   ownerId: undefined as number | undefined,
+  remark: ''
+})
+
+const functionForm = reactive({
+  issueFunctionCode: '',
   remark: ''
 })
 
@@ -501,6 +533,18 @@ const summaryFacts = computed(() => {
 
 const showCloseInfo = computed(() => {
   return Boolean(detail.value?.closedAt || detail.value?.closedByName || detail.value?.closeReason || detail.value?.closeEvidence)
+})
+
+const summaryFactsView = computed(() => {
+  if (!detail.value) {
+    return []
+  }
+  const baseFacts = summaryFacts.value.slice()
+  const issueFunctionFact = {
+    label: t('common.label.issueFunction'),
+    value: getIssueFunctionMeta(detail.value.issueFunctionCode).label
+  }
+  return [baseFacts[0], baseFacts[1], issueFunctionFact, ...baseFacts.slice(2)].filter(Boolean)
 })
 
 const latestTimelineItem = computed(() => detail.value?.comments?.[0])
@@ -830,6 +874,8 @@ async function loadData() {
     attachments
   }
   assignForm.ownerId = data.ownerId
+  functionForm.issueFunctionCode = data.issueFunctionCode || ''
+  functionForm.remark = ''
   priorityForm.priority = data.priority
   resetStatusForm()
 }
@@ -869,6 +915,20 @@ async function submitPriority() {
   await updateIssuePriority(Number(route.params.id), priorityForm)
   ElMessage.success('优先级已更新')
   priorityForm.remark = ''
+  await loadData()
+}
+
+async function submitFunction() {
+  if (!functionForm.issueFunctionCode) {
+    ElMessage.warning(t('issueList.validation.functionRequired'))
+    return
+  }
+  await updateIssueFunction(Number(route.params.id), {
+    issueFunctionCode: functionForm.issueFunctionCode,
+    remark: functionForm.remark.trim() || undefined
+  })
+  ElMessage.success(t('issueDetail.updateFunction'))
+  functionForm.remark = ''
   await loadData()
 }
 
@@ -933,6 +993,10 @@ function attachmentTypeLabel(fileType?: string) {
 }
 
 function goBackToProject() {
+  if (route.query.source === 'my-issues') {
+    router.push('/my-issues')
+    return
+  }
   if (currentProjectId.value) {
     router.push({
       path: '/issues',

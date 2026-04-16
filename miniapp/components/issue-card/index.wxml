@@ -21,6 +21,10 @@
     <text>录入时间 {{createdText}}</text>
   </view>
 
+  <view class="issue-line">
+    <text>属性 {{issueFunctionLabel}}</text>
+  </view>
+
   <view class="issue-foot">
     <text>下一步 {{nextActionText}}</text>
     <text wx:if="{{issue.closedAt}}" class="issue-overdue">已关闭</text>

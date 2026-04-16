@@ -1,6 +1,7 @@
 package com.company.opl.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -9,10 +10,14 @@ public class ChangePasswordRequest {
 
     private String oldPassword;
 
-    @NotBlank(message = "新密码不能为空")
-    @Size(min = 6, max = 32, message = "新密码长度必须在 6-32 位之间")
+    @NotBlank(message = "New password is required")
+    @Size(min = 10, max = 64, message = "Password length must be 10-64 characters")
+    @Pattern(
+            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z\\d])[\\S]{10,64}$",
+            message = "Password must include upper/lower case, number, and symbol"
+    )
     private String newPassword;
 
-    @NotBlank(message = "确认密码不能为空")
+    @NotBlank(message = "Confirm password is required")
     private String confirmPassword;
 }

@@ -6,6 +6,7 @@ import com.company.opl.dto.issue.IssueAssignDTO;
 import com.company.opl.dto.issue.IssueAttachmentAppendDTO;
 import com.company.opl.dto.issue.IssueCommentCreateDTO;
 import com.company.opl.dto.issue.IssueCreateDTO;
+import com.company.opl.dto.issue.IssueFunctionUpdateDTO;
 import com.company.opl.dto.issue.IssuePriorityUpdateDTO;
 import com.company.opl.dto.issue.IssueStatusChangeDTO;
 import com.company.opl.query.issue.IssueQuery;
@@ -91,6 +92,14 @@ public class IssueController {
     public Result<Void> updatePriority(@PathVariable Long issueId, @Valid @RequestBody IssuePriorityUpdateDTO dto) {
         issueService.updatePriority(issueId, dto);
         return Result.success("优先级更新成功", null);
+    }
+
+    @PutMapping("/{issueId}/function")
+    @PreAuthorize("hasAnyRole('RESP_ENGINEER','PROJECT_MANAGER','ADMIN')")
+    @Operation(summary = "更新问题属性")
+    public Result<Void> updateFunction(@PathVariable Long issueId, @Valid @RequestBody IssueFunctionUpdateDTO dto) {
+        issueService.updateIssueFunction(issueId, dto);
+        return Result.success("问题属性更新成功", null);
     }
 
     @PostMapping("/{issueId}/attachments")

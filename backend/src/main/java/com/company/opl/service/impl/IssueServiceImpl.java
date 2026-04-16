@@ -8,12 +8,14 @@ import com.company.opl.dto.issue.IssueAssignDTO;
 import com.company.opl.dto.issue.IssueAttachmentAppendDTO;
 import com.company.opl.dto.issue.IssueAttachmentDTO;
 import com.company.opl.dto.issue.IssueCreateDTO;
+import com.company.opl.dto.issue.IssueFunctionUpdateDTO;
 import com.company.opl.dto.issue.IssuePriorityUpdateDTO;
 import com.company.opl.entity.Issue;
 import com.company.opl.entity.IssueAttachment;
 import com.company.opl.entity.IssueComment;
 import com.company.opl.entity.IssueOperationLog;
 import com.company.opl.entity.SysUser;
+import com.company.opl.enums.IssueFunctionEnum;
 import com.company.opl.enums.IssueOperationTypeEnum;
 import com.company.opl.enums.IssuePriorityEnum;
 import com.company.opl.enums.IssueStatusEnum;
@@ -73,6 +75,7 @@ public class IssueServiceImpl extends ServiceImpl<IssueMapper, Issue> implements
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createIssue(IssueCreateDTO dto) {
+        validateIssueFunction(dto.getIssueFunctionCode());
         Issue issue = new Issue();
         BeanUtils.copyProperties(dto, issue);
         issue.setIssueNo(IssueNoGenerator.generate());
@@ -137,6 +140,26 @@ public class IssueServiceImpl extends ServiceImpl<IssueMapper, Issue> implements
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    public void updateIssueFunction(Long issueId, IssueFunctionUpdateDTO dto) {
+        Issue issue = loadIssue(issueId);
+        validateIssueFunction(dto.getIssueFunctionCode());
+
+        String fromValue = issue.getIssueFunctionCode();
+        if (dto.getIssueFunctionCode().equals(fromValue)) {
+            return;
+        }
+
+        issue.setIssueFunctionCode(dto.getIssueFunctionCode());
+        issue.setLastFollowUpAt(LocalDateTime.now());
+        updateById(issue);
+
+        String remark = StringUtils.hasText(dto.getRemark()) ? dto.getRemark() : "闂灞炴€ц皟鏁翠负 " + dto.getIssueFunctionCode();
+        recordOperation(issueId, IssueOperationTypeEnum.FUNCTION_CHANGE.getCode(), fromValue, dto.getIssueFunctionCode(), remark);
+        issueCommentService.createSystemComment(issueId, "闂灞炴€х敱 " + safeValue(fromValue) + " 璋冩暣涓?" + dto.getIssueFunctionCode() + appendRemark(dto.getRemark()), issue.getStatus());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public void appendAttachments(Long issueId, IssueAttachmentAppendDTO dto) {
         Issue issue = loadIssue(issueId);
         saveIssueAttachments(issueId, dto.getAttachments());
@@ -193,6 +216,7 @@ public class IssueServiceImpl extends ServiceImpl<IssueMapper, Issue> implements
                 .eq(query.getProjectId() != null, Issue::getProjectId, query.getProjectId())
                 .eq(query.getReporterId() != null, Issue::getReporterId, query.getReporterId())
                 .eq(query.getOwnerId() != null, Issue::getOwnerId, query.getOwnerId())
+                .eq(StringUtils.hasText(query.getIssueFunctionCode()), Issue::getIssueFunctionCode, query.getIssueFunctionCode())
                 .eq(StringUtils.hasText(query.getPriority()), Issue::getPriority, query.getPriority())
                 .ge(query.getCreatedFrom() != null, Issue::getCreatedAt, query.getCreatedFrom())
                 .le(query.getCreatedTo() != null, Issue::getCreatedAt, query.getCreatedTo())
@@ -202,13 +226,23 @@ public class IssueServiceImpl extends ServiceImpl<IssueMapper, Issue> implements
                         .like(Issue::getIssueNo, query.getKeyword())
                         .or()
                         .like(Issue::getDescription, query.getKeyword()))
-                .in(query.getStatusList() != null && !query.getStatusList().isEmpty(), Issue::getStatus, query.getStatusList())
-                .orderByDesc(Issue::getCreatedAt);
+                .in(query.getStatusList() != null && !query.getStatusList().isEmpty(), Issue::getStatus, query.getStatusList());
+
+        if (Boolean.TRUE.equals(query.getCurrentUserRelated())) {
+            Long currentUserId = SecurityUtils.getCurrentUserId();
+            wrapper.eq(Issue::getOwnerId, currentUserId);
+        }
 
         if (Boolean.TRUE.equals(query.getOverdueOnly())) {
             wrapper.lt(Issue::getDueAt, LocalDateTime.now())
                     .ne(Issue::getStatus, IssueStatusEnum.CLOSED.getCode())
                     .ne(Issue::getStatus, IssueStatusEnum.CANCELED.getCode());
+        }
+
+        if (Boolean.TRUE.equals(query.getSortByDueAt())) {
+            wrapper.last("ORDER BY CASE WHEN due_at IS NULL THEN 1 ELSE 0 END, due_at ASC, created_at DESC");
+        } else {
+            wrapper.orderByDesc(Issue::getCreatedAt);
         }
 
         Page<Issue> page = page(new Page<>(query.getCurrent(), query.getSize()), wrapper);
@@ -284,6 +318,12 @@ public class IssueServiceImpl extends ServiceImpl<IssueMapper, Issue> implements
         issue.setCurrentHandlerName(owner.getRealName());
     }
 
+    private void validateIssueFunction(String issueFunctionCode) {
+        if (!IssueFunctionEnum.contains(issueFunctionCode)) {
+            throw new BusinessException("闂灞炴€т笉鍚堟硶");
+        }
+    }
+
     private void saveIssueAttachments(Long issueId, List<IssueAttachmentDTO> attachments) {
         if (attachments == null || attachments.isEmpty()) {
             return;
@@ -334,6 +374,10 @@ public class IssueServiceImpl extends ServiceImpl<IssueMapper, Issue> implements
         log.setOperatorId(SecurityUtils.getCurrentUserId());
         log.setOperatorName(SecurityUtils.getCurrentRealName());
         operationLogMapper.insert(log);
+    }
+
+    private String safeValue(String value) {
+        return StringUtils.hasText(value) ? value : "-";
     }
 
     private SysUser loadEnabledUser(Long userId) {

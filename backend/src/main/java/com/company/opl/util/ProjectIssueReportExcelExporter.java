@@ -3,6 +3,7 @@ package com.company.opl.util;
 import com.company.opl.entity.Issue;
 import com.company.opl.entity.IssueAttachment;
 import com.company.opl.entity.Project;
+import com.company.opl.enums.IssueFunctionEnum;
 import com.company.opl.enums.IssuePriorityEnum;
 import com.company.opl.enums.IssueStatusEnum;
 import com.company.opl.query.issue.IssueQuery;
@@ -70,7 +71,7 @@ public final class ProjectIssueReportExcelExporter {
             buildCoverSheet(workbook, project, summary, issues, styles);
             buildSummarySheet(workbook, project, summary, issues, query, ownerFilterLabel, styles);
             buildChartsSheet(workbook, summary, issues, styles);
-            buildDetailSheet(workbook, issues, attachmentMap, publicBaseUrl, styles);
+            buildDetailSheet(workbook, project, issues, styles);
             workbook.write(outputStream);
             return outputStream.toByteArray();
         } catch (IOException exception) {
@@ -227,63 +228,55 @@ public final class ProjectIssueReportExcelExporter {
     }
 
     private static void buildDetailSheet(XSSFWorkbook workbook,
+                                         Project project,
                                          List<Issue> issues,
-                                         Map<Long, List<IssueAttachment>> attachmentMap,
-                                         String publicBaseUrl,
                                          ReportStyles styles) {
-        Sheet sheet = workbook.createSheet("问题清单");
+        Sheet sheet = workbook.createSheet(resolveOplSheetName(project));
         String[] headers = {
-                "问题编号", "OPL编号", "标题", "描述", "状态", "优先级", "影响等级", "提报人", "责任人",
-                "责任部门", "问题分类", "问题来源", "设备", "模块", "发生时间", "截止时间",
-                "关闭时间", "关闭人", "关闭说明", "关闭证据", "最新动作时间", "创建时间", "附件数", "附件入口"
+                "No",
+                "Date",
+                "Description of the task",
+                "priority",
+                "Key result",
+                "Deadline",
+                "Pilot",
+                "status",
+                "Comments"
         };
 
-        Row headerRow = sheet.createRow(0);
+        sheet.createRow(0);
+        Row headerRow = sheet.createRow(1);
+        headerRow.setHeightInPoints(22);
         for (int index = 0; index < headers.length; index++) {
             Cell cell = headerRow.createCell(index);
             cell.setCellValue(headers[index]);
-            cell.setCellStyle(styles.tableHeaderStyle());
+            cell.setCellStyle(styles.oplHeaderStyle());
         }
 
-        int rowIndex = 1;
+        int rowIndex = 2;
         for (Issue issue : issues) {
             Row row = sheet.createRow(rowIndex++);
-            int column = 0;
-            writeCell(row, column++, nullSafe(issue.getIssueNo()), styles.tableCellStyle());
-            writeCell(row, column++, nullSafe(issue.getOplNo()), styles.tableCellStyle());
-            writeCell(row, column++, nullSafe(issue.getTitle()), styles.tableCellStyle());
-            writeCell(row, column++, nullSafe(issue.getDescription()), styles.tableCellStyle());
-            writeCell(row, column++, resolveStatus(issue.getStatus()), styles.tableCellStyle());
-            writeCell(row, column++, resolvePriorityValue(issue.getPriority()), styles.tableCellStyle());
-            writeCell(row, column++, resolveImpactLevel(issue.getImpactLevel()), styles.tableCellStyle());
-            writeCell(row, column++, nullSafe(issue.getReporterName()), styles.tableCellStyle());
-            writeCell(row, column++, nullSafe(issue.getOwnerName()), styles.tableCellStyle());
-            writeCell(row, column++, nullSafe(issue.getOwnerDepartmentName()), styles.tableCellStyle());
-            writeCell(row, column++, nullSafe(issue.getCategoryCode()), styles.tableCellStyle());
-            writeCell(row, column++, nullSafe(issue.getSourceCode()), styles.tableCellStyle());
-            writeCell(row, column++, nullSafe(issue.getDeviceName()), styles.tableCellStyle());
-            writeCell(row, column++, nullSafe(issue.getModuleName()), styles.tableCellStyle());
-            writeCell(row, column++, formatDateTime(issue.getOccurredAt()), styles.tableCellStyle());
-            writeCell(row, column++, formatDateTime(issue.getDueAt()), styles.tableCellStyle());
-            writeCell(row, column++, formatDateTime(issue.getClosedAt()), styles.tableCellStyle());
-            writeCell(row, column++, nullSafe(issue.getClosedByName()), styles.tableCellStyle());
-            writeCell(row, column++, nullSafe(issue.getCloseReason()), styles.tableCellStyle());
-            writeCell(row, column++, nullSafe(issue.getCloseEvidence()), styles.tableCellStyle());
-            writeCell(row, column++, formatDateTime(issue.getLastFollowUpAt()), styles.tableCellStyle());
-            writeCell(row, column++, formatDateTime(issue.getCreatedAt()), styles.tableCellStyle());
+            row.setHeightInPoints(36);
 
-            List<IssueAttachment> attachments = attachmentMap.getOrDefault(issue.getId(), Collections.emptyList());
-            writeNumberCell(row, column++, attachments.size(), styles.tableCellStyle());
-            writeAttachmentLinkCell(workbook, row, column, attachments, publicBaseUrl, styles.linkStyle(), styles.tableCellStyle());
+            Cell noCell = row.createCell(0);
+            noCell.setCellFormula("ROW()-2");
+            noCell.setCellStyle(styles.oplCenterCellStyle());
+
+            writeCell(row, 1, resolveTemplateDate(issue), styles.oplCenterCellStyle());
+            writeCell(row, 2, resolveTemplateDescription(issue), styles.oplTextCellStyle());
+            writeCell(row, 3, resolveTemplatePriority(issue.getPriority()), styles.oplCenterCellStyle());
+            writeCell(row, 4, resolveTemplateKeyResult(issue), styles.oplTextCellStyle());
+            writeCell(row, 5, resolveTemplateDeadline(issue), styles.oplDateCellStyle());
+            writeCell(row, 6, resolveTemplatePilot(issue), styles.oplCenterCellStyle());
+            writeCell(row, 7, resolveTemplateStatus(issue.getStatus()), styles.oplCenterCellStyle());
+            writeCell(row, 8, resolveTemplateComments(issue), styles.oplTextCellStyle());
         }
 
-        sheet.createFreezePane(0, 1);
-        for (int index = 0; index < headers.length; index++) {
-            int width = switch (index) {
-                case 2, 3, 18, 19, 23 -> 30 * 256;
-                default -> 18 * 256;
-            };
-            sheet.setColumnWidth(index, width);
+        sheet.createFreezePane(1, 2);
+        sheet.setAutoFilter(new CellRangeAddress(1, 1, 0, headers.length - 1));
+        double[] widths = {8.83, 8.25, 53.83, 7.16, 59.16, 12.16, 15.58, 8.83, 38.83};
+        for (int index = 0; index < widths.length; index++) {
+            sheet.setColumnWidth(index, (int) (widths[index] * 256));
         }
     }
 
@@ -415,6 +408,10 @@ public final class ProjectIssueReportExcelExporter {
                 createTableHeaderStyle(workbook),
                 createTableCellStyle(workbook),
                 createLinkStyle(workbook),
+                createOplHeaderStyle(workbook),
+                createOplTextCellStyle(workbook),
+                createOplCenterCellStyle(workbook),
+                createOplDateCellStyle(workbook),
                 createCoverTitleStyle(workbook),
                 createCoverSubtitleStyle(workbook),
                 createCoverHintStyle(workbook),
@@ -478,6 +475,43 @@ public final class ProjectIssueReportExcelExporter {
         style.setWrapText(true);
         style.setVerticalAlignment(VerticalAlignment.TOP);
         addBorder(style);
+        return style;
+    }
+
+    private static CellStyle createOplHeaderStyle(XSSFWorkbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        style.setFillForegroundColor(IndexedColors.PALE_BLUE.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+        addBorder(style);
+        Font font = workbook.createFont();
+        font.setBold(true);
+        style.setFont(font);
+        return style;
+    }
+
+    private static CellStyle createOplTextCellStyle(XSSFWorkbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        style.setWrapText(true);
+        style.setAlignment(HorizontalAlignment.LEFT);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+        addBorder(style);
+        return style;
+    }
+
+    private static CellStyle createOplCenterCellStyle(XSSFWorkbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        style.setWrapText(true);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+        addBorder(style);
+        return style;
+    }
+
+    private static CellStyle createOplDateCellStyle(XSSFWorkbook workbook) {
+        CellStyle style = createOplTextCellStyle(workbook);
+        style.setAlignment(HorizontalAlignment.LEFT);
         return style;
     }
 
@@ -552,6 +586,76 @@ public final class ProjectIssueReportExcelExporter {
         return value == null || value.isBlank() ? "-" : value;
     }
 
+
+    private static String firstNonBlank(String... values) {
+        if (values == null) {
+            return "";
+        }
+        for (String value : values) {
+            if (value != null && !value.isBlank()) {
+                return value.trim();
+            }
+        }
+        return "";
+    }
+
+    private static String resolveOplSheetName(Project project) {
+        String baseName = firstNonBlank(project == null ? null : project.getProjectName(), project == null ? null : project.getProjectNo(), "OPL");
+        String sanitized = baseName.replace("\\", "-").replace("/", "-").replace("*", "-").replace("?", "-").replace(":", "-").replace("[", "-").replace("]", "-").trim();
+        if (sanitized.isBlank()) {
+            sanitized = "OPL";
+        }
+        return sanitized.length() > 31 ? sanitized.substring(0, 31) : sanitized;
+    }
+
+    private static String resolveTemplateDate(Issue issue) {
+        LocalDateTime occurredAt = issue.getOccurredAt() != null ? issue.getOccurredAt() : issue.getCreatedAt();
+        return occurredAt == null ? "" : DATE_FORMATTER.format(occurredAt.toLocalDate());
+    }
+
+    private static String resolveTemplateDescription(Issue issue) {
+        return firstNonBlank(issue.getDescription(), issue.getTitle());
+    }
+
+    private static String resolveTemplateKeyResult(Issue issue) {
+        return firstNonBlank(issue.getActionPlan(), issue.getCloseEvidence());
+    }
+
+    private static String resolveTemplateDeadline(Issue issue) {
+        return issue.getDueAt() == null ? "" : DATE_FORMATTER.format(issue.getDueAt().toLocalDate());
+    }
+
+    private static String resolveTemplatePilot(Issue issue) {
+        return firstNonBlank(issue.getPilotName(), issue.getOwnerName());
+    }
+
+    private static String resolveTemplatePriority(String value) {
+        if (value == null || value.isBlank()) {
+            return "";
+        }
+        return switch (IssuePriorityEnum.valueOf(value)) {
+            case CRITICAL, HIGH -> "A";
+            case MEDIUM -> "B";
+            case LOW -> "C";
+        };
+    }
+
+    private static String resolveTemplateStatus(String value) {
+        if (value == null || value.isBlank()) {
+            return "";
+        }
+        return switch (IssueStatusEnum.fromCode(value)) {
+            case CLOSED -> "Done";
+            case CANCELED -> "Canceled";
+            case NEW -> "New";
+            case ACCEPTED, IN_PROGRESS, PENDING_VERIFY, ON_HOLD -> "On Going";
+        };
+    }
+
+    private static String resolveTemplateComments(Issue issue) {
+        return firstNonBlank(issue.getLegacyComment(), issue.getCloseReason(), issue.getCloseEvidence());
+    }
+
     private static String formatDateTime(LocalDateTime value) {
         return value == null ? "-" : DATE_TIME_FORMATTER.format(value);
     }
@@ -624,6 +728,20 @@ public final class ProjectIssueReportExcelExporter {
         };
     }
 
-    private record ReportStyles(CellStyle titleStyle, CellStyle sectionStyle, CellStyle labelStyle, CellStyle valueStyle, CellStyle tableHeaderStyle, CellStyle tableCellStyle, CellStyle linkStyle, CellStyle coverTitleStyle, CellStyle coverSubtitleStyle, CellStyle coverHintStyle, CellStyle coverNoteStyle) {
+    private record ReportStyles(CellStyle titleStyle,
+                                CellStyle sectionStyle,
+                                CellStyle labelStyle,
+                                CellStyle valueStyle,
+                                CellStyle tableHeaderStyle,
+                                CellStyle tableCellStyle,
+                                CellStyle linkStyle,
+                                CellStyle oplHeaderStyle,
+                                CellStyle oplTextCellStyle,
+                                CellStyle oplCenterCellStyle,
+                                CellStyle oplDateCellStyle,
+                                CellStyle coverTitleStyle,
+                                CellStyle coverSubtitleStyle,
+                                CellStyle coverHintStyle,
+                                CellStyle coverNoteStyle) {
     }
 }

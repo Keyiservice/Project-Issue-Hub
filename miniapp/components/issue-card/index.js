@@ -1,4 +1,5 @@
 const {
+  getIssueFunctionMeta,
   getPriorityMeta,
   formatDateTime,
   getNextActionHint,
@@ -17,6 +18,7 @@ Component({
     progressTone: 'gray',
     priorityLabel: '-',
     priorityTone: 'gray',
+    issueFunctionLabel: '-',
     createdText: '-',
     nextActionText: '-'
   },
@@ -24,11 +26,13 @@ Component({
     issue(value) {
       const priority = getPriorityMeta(value.priority)
       const progress = getProgressMeta(value.status, Boolean(value.overdue))
+      const issueFunction = getIssueFunctionMeta(value.issueFunctionCode)
       this.setData({
         progressLabel: progress.label,
         progressTone: progress.tone,
         priorityLabel: priority.label,
         priorityTone: priority.tone,
+        issueFunctionLabel: issueFunction.label,
         createdText: formatDateTime(value.createdAt),
         nextActionText: value.nextActionText || getNextActionHint(value.status, Boolean(value.ownerName))
       })

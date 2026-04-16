@@ -14,6 +14,16 @@ const priorityMap = {
   CRITICAL: { label: '紧急', tone: 'rose' }
 }
 
+const issueFunctionMap = {
+  PAT: { label: 'PAT', tone: 'blue' },
+  FAT: { label: 'FAT', tone: 'amber' },
+  DESIGN: { label: '设计', tone: 'slate' },
+  SAFETY: { label: '安全', tone: 'rose' },
+  LOGISTICS: { label: '物流', tone: 'gray' },
+  PROCUREMENT: { label: '采购', tone: 'orange' },
+  ASSEMBLY: { label: '装配', tone: 'teal' }
+}
+
 const projectStatusMap = {
   PLANNING: { label: '规划中', tone: 'gray' },
   IN_PROGRESS: { label: '进行中', tone: 'amber' },
@@ -35,6 +45,10 @@ function getPriorityMeta(priority) {
 
 function getProjectStatusMeta(status) {
   return projectStatusMap[status] || { label: status || '-', tone: 'gray' }
+}
+
+function getIssueFunctionMeta(issueFunctionCode) {
+  return issueFunctionMap[issueFunctionCode] || { label: issueFunctionCode || '-', tone: 'gray' }
 }
 
 function getProgressMeta(status, overdue) {
@@ -123,6 +137,7 @@ module.exports = {
   getStatusMeta,
   getPriorityMeta,
   getProjectStatusMeta,
+  getIssueFunctionMeta,
   getProgressMeta,
   formatFileSize,
   formatDateTime,

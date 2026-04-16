@@ -22,9 +22,12 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final com.company.opl.mapper.SysUserMapper sysUserMapper;
 
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider) {
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider,
+                                   com.company.opl.mapper.SysUserMapper sysUserMapper) {
         this.jwtTokenProvider = jwtTokenProvider;
+        this.sysUserMapper = sysUserMapper;
     }
 
     @Override
@@ -55,6 +58,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 UsernamePasswordAuthenticationToken authenticationToken =
                         new UsernamePasswordAuthenticationToken(loginUser, null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+                if (userId != null) {
+                    com.company.opl.entity.SysUser user = sysUserMapper.selectById(userId);
+                    if (user != null && user.getPasswordChangeRequired() != null && user.getPasswordChangeRequired() == 1) {
+                        String path = request.getRequestURI();
+                        if (!path.startsWith("/api/auth/change-password")
+                                && !path.startsWith("/api/auth/mfa/")
+                                && !path.startsWith("/api/auth/me")) {
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            return;
+                        }
+                    }
+                }
             } catch (JwtException ignored) {
                 SecurityContextHolder.clearContext();
             }

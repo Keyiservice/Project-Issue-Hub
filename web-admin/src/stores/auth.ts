@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { login, type LoginPayload } from '@/api/auth'
+import { login, type LoginPayload, type LoginResponse } from '@/api/auth'
 
 interface UserState {
   token: string
@@ -14,14 +14,20 @@ export const useAuthStore = defineStore('auth', {
     roles: JSON.parse(localStorage.getItem('opl_roles') || '[]')
   }),
   actions: {
+    applyLogin(data: LoginResponse) {
+      if (data.accessToken) {
+        this.token = data.accessToken
+        this.realName = data.realName
+        this.roles = data.roles
+        localStorage.setItem('opl_token', data.accessToken)
+        localStorage.setItem('opl_real_name', data.realName)
+        localStorage.setItem('opl_roles', JSON.stringify(data.roles))
+      }
+    },
     async signIn(payload: LoginPayload) {
       const { data } = await login(payload)
-      this.token = data.accessToken
-      this.realName = data.realName
-      this.roles = data.roles
-      localStorage.setItem('opl_token', data.accessToken)
-      localStorage.setItem('opl_real_name', data.realName)
-      localStorage.setItem('opl_roles', JSON.stringify(data.roles))
+      this.applyLogin(data as LoginResponse)
+      return data as LoginResponse
     },
     signOut() {
       this.token = ''
@@ -33,4 +39,3 @@ export const useAuthStore = defineStore('auth', {
     }
   }
 })
-

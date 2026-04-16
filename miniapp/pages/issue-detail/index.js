@@ -5,6 +5,7 @@ const { downloadAttachmentToTemp } = require('../../utils/attachment')
 const {
   formatFileSize,
   getAttachmentType,
+  getIssueFunctionMeta,
   getPriorityMeta,
   getStatusMeta,
   getNextActionHint,
@@ -220,6 +221,7 @@ Page({
   async hydrateDetail(detail) {
     const statusMeta = getStatusMeta(detail.status)
     const priorityMeta = getPriorityMeta(detail.priority)
+    const issueFunctionMeta = getIssueFunctionMeta(detail.issueFunctionCode)
     const progressMeta = getProgressMeta(detail.status, Boolean(detail.overdue))
     const attachments = await this.hydrateAttachments(detail.attachments || [])
     const comments = await this.hydrateComments(detail.comments || [])
@@ -231,6 +233,7 @@ Page({
       closedText: formatDateTime(detail.closedAt),
       statusLabel: statusMeta.label,
       priorityLabel: priorityMeta.label,
+      issueFunctionLabel: issueFunctionMeta.label,
       priorityTone: priorityMeta.tone,
       progressLabel: progressMeta.label,
       progressTone: progressMeta.tone,

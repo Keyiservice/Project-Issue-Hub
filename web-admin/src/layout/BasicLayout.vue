@@ -2,14 +2,14 @@
   <div class="layout-shell">
     <aside class="sidebar">
       <div class="brand-panel">
-        <p class="brand-kicker">PROJECT ISSUE HUB</p>
-        <h2 class="brand-title">项目问题协同平台</h2>
+        <p class="brand-kicker">{{ t('common.appName') }}</p>
+        <h2 class="brand-title">{{ t('layout.brandTitle') }}</h2>
       </div>
 
       <div class="sidebar-section">
         <div class="section-meta">
-          <span>Navigation</span>
-          <span class="section-badge">Project First</span>
+          <span>{{ t('layout.navigation') }}</span>
+          <span class="section-badge">{{ t('layout.projectFirst') }}</span>
         </div>
         <el-menu router :default-active="activeMenu" class="menu">
           <el-menu-item v-for="item in menuItems" :key="item.path" :index="item.path">
@@ -23,7 +23,7 @@
       <div class="sidebar-footer">
         <div class="signal-card">
           <div class="signal-dot"></div>
-          <div class="signal-title">Asia/Shanghai</div>
+          <div class="signal-title">{{ t('layout.timezone') }}</div>
         </div>
       </div>
     </aside>
@@ -31,7 +31,7 @@
     <main class="workspace">
       <header class="topbar">
         <div>
-          <p class="opl-section-title">Project Issue Hub</p>
+          <p class="opl-section-title">{{ t('common.appName') }}</p>
           <h1 class="topbar-title">{{ currentTitle }}</h1>
         </div>
 
@@ -41,15 +41,24 @@
             <span>{{ nowLabel }}</span>
           </div>
 
+          <el-select v-model="localeValue" class="language-select" size="large">
+            <el-option
+              v-for="item in localeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+
           <div class="identity-card">
             <div class="identity-avatar">{{ avatarText }}</div>
             <div>
-              <div class="identity-name">{{ authStore.realName || '未登录用户' }}</div>
+              <div class="identity-name">{{ authStore.realName || t('common.empty.notLoggedIn') }}</div>
               <div class="identity-role">{{ roleText }}</div>
             </div>
           </div>
 
-          <el-button plain @click="logout">退出登录</el-button>
+          <el-button plain @click="logout">{{ t('common.action.logout') }}</el-button>
         </div>
       </header>
 
@@ -61,75 +70,115 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import { localeLabelMap, supportedLocales, type AppLocale } from '@/i18n/locales'
 import { useAuthStore } from '@/stores/auth'
+import { useLocaleStore } from '@/stores/locale'
+import { getRoleLabel } from '@/utils/view-mappers'
 
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const localeStore = useLocaleStore()
+const { t, locale } = useI18n()
 
-const menuItems = [
-  { path: '/dashboard', label: '驾驶舱' },
-  { path: '/issue-projects', label: '项目问题库' },
-  { path: '/projects', label: '项目协同' },
-  { path: '/stats', label: '统计分析' },
-  { path: '/system/users', label: '用户管理' },
-  { path: '/system/dicts', label: '字典配置' }
-]
+const now = ref(new Date())
+let timer: number | null = null
+
+const localeOptions = supportedLocales.map((value) => ({
+  value,
+  label: localeLabelMap[value]
+}))
+
+function hasAnyRole(allowedRoles?: string[]) {
+  if (!allowedRoles?.length) {
+    return true
+  }
+  return allowedRoles.some((role) => authStore.roles.includes(role))
+}
+
+const menuItems = computed(() =>
+  [
+    { path: '/dashboard', label: t('layout.menus.dashboard'), roles: ['PROJECT_MANAGER', 'MANAGEMENT', 'ADMIN'] },
+    { path: '/issue-projects', label: t('layout.menus.issueProjects'), roles: ['SITE_USER', 'RESP_ENGINEER', 'PROJECT_MANAGER', 'MANAGEMENT', 'ADMIN'] },
+    { path: '/my-issues', label: t('layout.menus.myIssues'), roles: ['SITE_USER', 'RESP_ENGINEER', 'PROJECT_MANAGER', 'MANAGEMENT', 'ADMIN'] },
+    { path: '/projects', label: t('layout.menus.projects'), roles: ['SITE_USER', 'RESP_ENGINEER', 'PROJECT_MANAGER', 'MANAGEMENT', 'ADMIN'] },
+    { path: '/stats', label: t('layout.menus.stats'), roles: ['PROJECT_MANAGER', 'MANAGEMENT', 'ADMIN'] },
+    { path: '/system/users', label: t('layout.menus.users'), roles: ['ADMIN'] },
+    { path: '/system/dicts', label: t('layout.menus.dicts'), roles: ['ADMIN'] }
+  ].filter((item) => hasAnyRole(item.roles))
+)
+
+const localeValue = computed({
+  get: () => localeStore.currentLocale,
+  set: (value: AppLocale) => localeStore.setLocale(value)
+})
 
 const titleMap: Record<string, string> = {
-  '/dashboard': '管理驾驶舱',
-  '/issue-projects': '项目问题库入口',
-  '/issues': '项目问题清单',
-  '/projects': '项目协同',
-  '/stats': '统计分析',
-  '/system/users': '用户与角色',
-  '/system/dicts': '字典配置'
+  '/dashboard': 'layout.titles.dashboard',
+  '/issue-projects': 'layout.titles.issueProjects',
+  '/my-issues': 'layout.titles.myIssues',
+  '/issues': 'layout.titles.issues',
+  '/projects': 'layout.titles.projects',
+  '/stats': 'layout.titles.stats',
+  '/system/users': 'layout.titles.users',
+  '/system/dicts': 'layout.titles.dicts'
 }
 
 const currentTitle = computed(() => {
   if (route.path.startsWith('/issues/')) {
-    return '问题详情'
+    return t('layout.titles.issueDetail')
   }
-  return titleMap[route.path] || 'Project Issue Hub'
+  const key = titleMap[route.path]
+  return key ? t(key) : t('common.appName')
 })
 
 const activeMenu = computed(() => {
+  if (route.path.startsWith('/my-issues')) {
+    return '/my-issues'
+  }
   if (route.path.startsWith('/issues')) {
     return '/issue-projects'
   }
   return route.path
 })
 
-const roleMap: Record<string, string> = {
-  SITE_USER: '现场人员',
-  RESP_ENGINEER: '责任工程师',
-  PROJECT_MANAGER: '项目经理',
-  MANAGEMENT: '管理层',
-  ADMIN: '管理员'
-}
-
 const roleText = computed(() => {
   if (!authStore.roles.length) {
-    return '未分配角色'
+    return t('common.empty.noRole')
   }
-  return authStore.roles.map((item) => roleMap[item] || item).join(' / ')
+  return authStore.roles.map((item) => getRoleLabel(item)).join(' / ')
 })
 
-const avatarText = computed(() => (authStore.realName || '现').slice(0, 1))
+const avatarText = computed(() => (authStore.realName || 'P').slice(0, 1).toUpperCase())
 
-const nowLabel = new Intl.DateTimeFormat('zh-CN', {
-  month: '2-digit',
-  day: '2-digit',
-  hour: '2-digit',
-  minute: '2-digit'
-}).format(new Date())
+const nowLabel = computed(() =>
+  new Intl.DateTimeFormat(locale.value, {
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  }).format(now.value)
+)
 
 function logout() {
   authStore.signOut()
   router.push('/login')
 }
+
+onMounted(() => {
+  timer = window.setInterval(() => {
+    now.value = new Date()
+  }, 60000)
+})
+
+onBeforeUnmount(() => {
+  if (timer) {
+    window.clearInterval(timer)
+  }
+})
 </script>
 
 <style scoped>
@@ -279,6 +328,10 @@ function logout() {
   height: 8px;
   border-radius: 50%;
   background: var(--opl-teal);
+}
+
+.language-select {
+  width: 140px;
 }
 
 .identity-card {

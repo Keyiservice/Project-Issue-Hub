@@ -105,9 +105,19 @@ export interface ProjectIssueSummary {
 export interface ProjectIssueReportQuery {
   keyword?: string
   ownerId?: number
+  issueFunctionCode?: string
   priority?: string
   statusList?: string[]
   overdueOnly?: boolean
+}
+
+export interface ProjectIssueImportResult {
+  totalCount: number
+  addedCount: number
+  updatedCount: number
+  skippedCount: number
+  failedCount: number
+  failedMessages: string[]
 }
 
 export function fetchProjectPage(params: ProjectQuery) {
@@ -124,6 +134,16 @@ export function fetchProjectIssueSummary(projectId: number) {
 
 export function exportProjectIssueReport(projectId: number, params?: ProjectIssueReportQuery) {
   return downloadBinary(`/projects/${projectId}/issue-report/export`, { params })
+}
+
+export function importProjectIssueReport(projectId: number, file: File) {
+  const formData = new FormData()
+  formData.append('file', file)
+  return request.post<unknown, Result<ProjectIssueImportResult>>(`/projects/${projectId}/issue-report/import`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
 }
 
 export function createProject(data: ProjectCreatePayload) {

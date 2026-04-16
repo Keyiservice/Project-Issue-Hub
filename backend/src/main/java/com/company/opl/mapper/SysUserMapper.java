@@ -14,6 +14,7 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
             SELECT id, user_no, username, password_hash, real_name, mobile, email,
                    wechat_openid, wechat_unionid, wechat_bound_at,
                    password_change_required, password_changed_at,
+                   mfa_enabled, mfa_secret, mfa_verified_at,
                    department_code, department_name, status, last_login_at,
                    created_by, updated_by, created_at, updated_at, deleted
             FROM sys_user
@@ -26,6 +27,7 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
             SELECT id, user_no, username, password_hash, real_name, mobile, email,
                    wechat_openid, wechat_unionid, wechat_bound_at,
                    password_change_required, password_changed_at,
+                   mfa_enabled, mfa_secret, mfa_verified_at,
                    department_code, department_name, status, last_login_at,
                    created_by, updated_by, created_at, updated_at, deleted
             FROM sys_user
@@ -36,15 +38,17 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 
     @Update("""
             UPDATE sys_user
-            SET user_no = #{user.userNo},
-                username = #{user.username},
-                password_hash = #{user.passwordHash},
-                real_name = #{user.realName},
-                department_code = #{user.departmentCode},
-                department_name = #{user.departmentName},
-                status = #{user.status},
-                password_change_required = #{user.passwordChangeRequired},
-                deleted = 0
+        SET user_no = #{user.userNo},
+            username = #{user.username},
+            password_hash = #{user.passwordHash},
+            real_name = #{user.realName},
+            department_code = #{user.departmentCode},
+            department_name = #{user.departmentName},
+            status = #{user.status},
+            password_change_required = #{user.passwordChangeRequired},
+            mfa_enabled = #{user.mfaEnabled},
+            mfa_secret = #{user.mfaSecret},
+            deleted = 0
             WHERE id = #{user.id}
             """)
     int restoreSeedUser(@Param("user") SysUser user);

@@ -4,16 +4,15 @@
       <el-card class="hero-card">
         <div class="hero-toolbar">
           <div>
-            <p class="opl-section-title">Control Tower</p>
+            <p class="opl-section-title">{{ t('dashboard.section') }}</p>
             <h2 class="hero-title">{{ heroTitle }}</h2>
             <div class="hero-meta opl-inline-meta">
               <span v-if="displayProject?.customerName">
-                客户 <strong>{{ displayProject.customerName }}</strong>
+                {{ t('dashboard.customer') }} <strong>{{ displayProject.customerName }}</strong>
               </span>
               <span v-if="displayProject?.projectManagerName">
-                项目经理 <strong>{{ displayProject.projectManagerName }}</strong>
+                {{ t('common.label.projectManager') }} <strong>{{ displayProject.projectManagerName }}</strong>
               </span>
-              <span>{{ modeDescription }}</span>
             </div>
           </div>
 
@@ -22,7 +21,7 @@
               v-model="selectedProjectId"
               clearable
               filterable
-              placeholder="未选择则自动轮巡"
+              :placeholder="t('dashboard.autoRotatePlaceholder')"
               class="project-select"
               @change="handleProjectChange"
               @clear="handleProjectClear"
@@ -34,52 +33,36 @@
                 :value="project.id"
               />
             </el-select>
-            <span class="opl-chip" :class="modeTone">{{ modeLabel }}</span>
           </div>
         </div>
 
         <div class="hero-tags">
           <span v-if="displayProject?.projectNo" class="opl-chip slate">{{ displayProject.projectNo }}</span>
           <span class="opl-chip orange">{{ contextLabel }}</span>
-          <span v-if="autoRotationActive" class="opl-chip blue">每 8 秒轮巡</span>
+          <span v-if="autoRotationActive" class="opl-chip blue">{{ t('dashboard.every8Seconds') }}</span>
         </div>
       </el-card>
 
       <el-card class="hero-side">
         <div class="hero-side-header">
           <div>
-            <h3 class="opl-card-title">{{ displayProject?.projectName || '全部项目' }}</h3>
-            <p class="hero-side-subtitle">
-              {{ displayProject?.status || 'GLOBAL' }} · {{ stats.totalIssues }} 个问题
-            </p>
+            <h3 class="opl-card-title">{{ displayProject?.projectName || t('stats.allProjects') }}</h3>
+            <p class="hero-side-subtitle">{{ stats.totalIssues }} {{ t('dashboard.totalIssues') }}</p>
           </div>
-          <span class="opl-chip" :class="alertTone">{{ alertLabel }}</span>
         </div>
 
         <div class="hero-kpis">
           <div class="hero-kpi">
-            <span class="opl-kv-label">闭环率</span>
+            <span class="opl-kv-label">{{ t('stats.closeRate') }}</span>
             <strong class="hero-kpi-value">{{ closeRate }}%</strong>
           </div>
           <div class="hero-kpi">
-            <span class="opl-kv-label">高优先级占比</span>
+            <span class="opl-kv-label">{{ t('stats.highPriorityRate') }}</span>
             <strong class="hero-kpi-value">{{ highPriorityRate }}%</strong>
           </div>
           <div class="hero-kpi">
-            <span class="opl-kv-label">超期占比</span>
+            <span class="opl-kv-label">{{ t('stats.overdueRate') }}</span>
             <strong class="hero-kpi-value">{{ overdueRate }}%</strong>
-          </div>
-        </div>
-
-        <div class="health-list">
-          <div v-for="item in healthList" :key="item.label" class="health-item">
-            <div class="health-head">
-              <span>{{ item.label }}</span>
-              <strong>{{ item.value }}%</strong>
-            </div>
-            <div class="health-track">
-              <div class="health-fill" :class="item.tone" :style="{ width: `${item.value}%` }"></div>
-            </div>
           </div>
         </div>
       </el-card>
@@ -89,7 +72,6 @@
       <el-card v-for="card in cards" :key="card.label" class="opl-stat-card">
         <div class="opl-stat-label">{{ card.label }}</div>
         <div class="opl-stat-value">{{ card.value }}</div>
-        <div class="stat-context">{{ card.note }}</div>
       </el-card>
     </section>
 
@@ -97,8 +79,7 @@
       <el-card>
         <template #header>
           <div>
-            <h3 class="opl-card-title">新增 / 关闭趋势</h3>
-            <p class="hero-side-subtitle">{{ trendSubtitle }}</p>
+            <h3 class="opl-card-title">{{ t('dashboard.trendTitle') }}</h3>
           </div>
         </template>
         <div ref="chartRef" class="chart"></div>
@@ -107,8 +88,7 @@
       <el-card>
         <template #header>
           <div>
-            <h3 class="opl-card-title">当前关注清单</h3>
-            <p class="hero-side-subtitle">{{ focusSubtitle }}</p>
+            <h3 class="opl-card-title">{{ t('dashboard.focusTitle') }}</h3>
           </div>
         </template>
 
@@ -128,10 +108,12 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import * as echarts from 'echarts'
 import { fetchDashboardStats } from '@/api/stats'
 import { fetchProjectAll, type ProjectItem } from '@/api/project'
 
+const { t } = useI18n()
 const chartRef = ref<HTMLDivElement>()
 let trendChart: echarts.ECharts | null = null
 let rotationTimer: number | null = null
@@ -161,47 +143,18 @@ const displayProject = computed(() => {
 })
 
 const autoRotationActive = computed(() => !selectedProjectId.value && projects.value.length > 1)
-const contextLabel = computed(() => (displayProject.value ? `${displayProject.value.projectName} 项目视角` : '全部项目视角'))
-const modeLabel = computed(() => (selectedProjectId.value ? '已锁定项目' : autoRotationActive.value ? '自动轮巡' : '当前项目'))
-const modeTone = computed(() => (selectedProjectId.value ? 'orange' : autoRotationActive.value ? 'blue' : 'teal'))
-const modeDescription = computed(() => {
-  if (selectedProjectId.value) {
-    return '已锁定到单个项目，趋势和清单只看当前项目。'
-  }
-  if (autoRotationActive.value) {
-    return '未锁定项目，驾驶舱会自动轮巡各项目。'
-  }
-  if (displayProject.value) {
-    return '当前仅有一个项目，驾驶舱固定展示该项目。'
-  }
-  return '当前没有可轮巡项目，回退为全部项目统计。'
-})
-
-const heroTitle = computed(() => (displayProject.value ? `${displayProject.value.projectName} 驾驶舱` : '全部项目驾驶舱'))
-const trendSubtitle = computed(() => `最近 7 天的新增与关闭节奏，当前视角：${contextLabel.value}`)
-const focusSubtitle = computed(() => `当前只列出 ${displayProject.value ? displayProject.value.projectName : '全部项目'} 需要动作的信号。`)
+const contextLabel = computed(() =>
+  displayProject.value ? t('dashboard.projectScope', { name: displayProject.value.projectName }) : t('dashboard.globalScope')
+)
+const heroTitle = computed(() =>
+  displayProject.value ? `${displayProject.value.projectName} ${t('dashboard.cockpitSuffix')}` : t('dashboard.globalTitle')
+)
 
 const cards = computed(() => [
-  {
-    label: '问题总数',
-    value: stats.value.totalIssues,
-    note: `${contextLabel.value}下的全部问题规模`
-  },
-  {
-    label: '未关闭问题',
-    value: stats.value.openIssues,
-    note: '新建、处理中、待验证和挂起总和'
-  },
-  {
-    label: '高优先级问题',
-    value: stats.value.highPriorityIssues,
-    note: 'HIGH / CRITICAL 且未关闭'
-  },
-  {
-    label: '超期问题',
-    value: stats.value.overdueIssues,
-    note: '超过截止时间且未关闭'
-  }
+  { label: t('dashboard.totalIssues'), value: stats.value.totalIssues },
+  { label: t('dashboard.openIssues'), value: stats.value.openIssues },
+  { label: t('dashboard.highPriorityIssues'), value: stats.value.highPriorityIssues },
+  { label: t('dashboard.overdueIssues'), value: stats.value.overdueIssues }
 ])
 
 const closeRate = computed(() => {
@@ -225,42 +178,16 @@ const overdueRate = computed(() => {
   return Math.round((stats.value.overdueIssues / stats.value.totalIssues) * 100)
 })
 
-const alertLabel = computed(() => {
-  if (stats.value.overdueIssues > 0) {
-    return '需升级处理'
-  }
-  if (stats.value.highPriorityIssues > 0) {
-    return '重点盯防'
-  }
-  return '节奏稳定'
-})
-
-const alertTone = computed(() => {
-  if (stats.value.overdueIssues > 0) {
-    return 'rose'
-  }
-  if (stats.value.highPriorityIssues > 0) {
-    return 'amber'
-  }
-  return 'teal'
-})
-
-const healthList = computed(() => [
-  { label: '闭环效率', value: closeRate.value, tone: 'teal' },
-  { label: '高优压力', value: highPriorityRate.value, tone: 'amber' },
-  { label: '超期风险', value: overdueRate.value, tone: 'rose' }
-])
-
 const focusList = computed(() => {
-  const label = displayProject.value ? displayProject.value.projectName : '当前视角'
+  const label = displayProject.value ? displayProject.value.projectName : t('stats.allProjects')
   const items = []
 
   if (stats.value.overdueIssues > 0) {
     items.push({
       level: 'P1',
       tone: 'rose',
-      title: `${label}存在 ${stats.value.overdueIssues} 个超期问题`,
-      desc: '先盯超期和未分派项，避免项目节奏继续拖延。'
+      title: t('dashboard.focus.overdue', { name: label, count: stats.value.overdueIssues }),
+      desc: t('dashboard.focus.overdueDesc')
     })
   }
 
@@ -268,8 +195,8 @@ const focusList = computed(() => {
     items.push({
       level: 'P2',
       tone: 'amber',
-      title: `${label}存在 ${stats.value.highPriorityIssues} 个高优先级问题`,
-      desc: '建议优先核对责任人、下一步动作和关闭验证安排。'
+      title: t('dashboard.focus.priority', { name: label, count: stats.value.highPriorityIssues }),
+      desc: t('dashboard.focus.priorityDesc')
     })
   }
 
@@ -277,8 +204,8 @@ const focusList = computed(() => {
     items.push({
       level: 'P3',
       tone: 'blue',
-      title: `${label}仍有 ${stats.value.openIssues} 个未关闭问题`,
-      desc: '新增和关闭趋势要同步看，避免问题池持续堆积。'
+      title: t('dashboard.focus.open', { name: label, count: stats.value.openIssues }),
+      desc: t('dashboard.focus.openDesc')
     })
   }
 
@@ -286,8 +213,8 @@ const focusList = computed(() => {
     items.push({
       level: 'OK',
       tone: 'teal',
-      title: `${label}当前没有未关闭问题`,
-      desc: '问题池清空，可转为关注新增质量和项目资源准备。'
+      title: t('dashboard.focus.clear', { name: label }),
+      desc: t('dashboard.focus.clearDesc')
     })
   }
 
@@ -335,7 +262,7 @@ function renderChart() {
     },
     series: [
       {
-        name: '新增',
+        name: t('dashboard.created'),
         type: 'line',
         smooth: true,
         symbolSize: 8,
@@ -349,7 +276,7 @@ function renderChart() {
         data: stats.value.createdTrend
       },
       {
-        name: '关闭',
+        name: t('dashboard.closed'),
         type: 'line',
         smooth: true,
         symbolSize: 8,
@@ -489,10 +416,6 @@ onBeforeUnmount(() => {
   color: var(--opl-text);
 }
 
-.hero-meta {
-  margin-top: 8px;
-}
-
 .hero-tags {
   display: flex;
   flex-wrap: wrap;
@@ -507,8 +430,7 @@ onBeforeUnmount(() => {
   gap: 12px;
 }
 
-.hero-side-subtitle,
-.stat-context {
+.hero-side-subtitle {
   margin-top: 8px;
   color: var(--opl-muted);
   line-height: 1.7;
@@ -535,49 +457,6 @@ onBeforeUnmount(() => {
   font-size: 28px;
   line-height: 1;
   color: var(--opl-text);
-}
-
-.health-list {
-  margin-top: 24px;
-  display: grid;
-  gap: 16px;
-}
-
-.health-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  color: var(--opl-muted);
-  font-size: 13px;
-}
-
-.health-head strong {
-  color: var(--opl-text);
-}
-
-.health-track {
-  overflow: hidden;
-  height: 10px;
-  border-radius: 999px;
-  background: rgba(24, 33, 43, 0.08);
-}
-
-.health-fill {
-  height: 100%;
-  border-radius: 999px;
-}
-
-.health-fill.teal {
-  background: linear-gradient(90deg, #0f766e, #21a598);
-}
-
-.health-fill.amber {
-  background: linear-gradient(90deg, #cb7d1f, #e6a447);
-}
-
-.health-fill.rose {
-  background: linear-gradient(90deg, #c65c4e, #e08b7d);
 }
 
 .analysis-grid {

@@ -13,6 +13,9 @@ public class IssueQuery {
     private Long projectId;
     private Long reporterId;
     private Long ownerId;
+    private String issueFunctionCode;
+    private Boolean currentUserRelated;
+    private Boolean sortByDueAt;
     private String keyword;
     private List<String> statusList;
     private String priority;

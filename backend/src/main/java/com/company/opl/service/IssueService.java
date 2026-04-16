@@ -5,6 +5,7 @@ import com.company.opl.common.PageResult;
 import com.company.opl.dto.issue.IssueAssignDTO;
 import com.company.opl.dto.issue.IssueAttachmentAppendDTO;
 import com.company.opl.dto.issue.IssueCreateDTO;
+import com.company.opl.dto.issue.IssueFunctionUpdateDTO;
 import com.company.opl.dto.issue.IssuePriorityUpdateDTO;
 import com.company.opl.entity.Issue;
 import com.company.opl.query.issue.IssueQuery;
@@ -17,6 +18,8 @@ public interface IssueService extends IService<Issue> {
     void assignIssue(Long issueId, IssueAssignDTO dto);
 
     void updatePriority(Long issueId, IssuePriorityUpdateDTO dto);
+
+    void updateIssueFunction(Long issueId, IssueFunctionUpdateDTO dto);
 
     void appendAttachments(Long issueId, IssueAttachmentAppendDTO dto);
 

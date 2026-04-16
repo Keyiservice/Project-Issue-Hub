@@ -47,6 +47,19 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    public String generateMfaToken(Long userId, String username, long expireSeconds) {
+        Instant now = Instant.now();
+        Instant expiry = now.plusSeconds(expireSeconds);
+        return Jwts.builder()
+                .subject(username)
+                .claim("userId", userId)
+                .claim("mfaPending", true)
+                .issuedAt(Date.from(now))
+                .expiration(Date.from(expiry))
+                .signWith(secretKey)
+                .compact();
+    }
+
     public Claims parseClaims(String token) {
         return Jwts.parser()
                 .verifyWith(secretKey)

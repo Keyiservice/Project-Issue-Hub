@@ -2,36 +2,34 @@
   <div class="selector-page">
     <section class="opl-page-head">
       <div>
-        <p class="opl-section-title">Project First</p>
-        <h2 class="opl-page-title">先选项目，再进入该项目的问题库。</h2>
-        <p class="opl-page-lead">
-          每个项目都应该有自己的问题池。这样管理时不会把不同客户、不同交付阶段的问题混在一起，责任、优先级和节奏都更清楚。
-        </p>
+        <p class="opl-section-title">{{ t('layout.projectFirst') }}</p>
+        <h2 class="opl-page-title">{{ t('projectSelector.title') }}</h2>
+        <p class="opl-page-lead">{{ t('projectSelector.lead') }}</p>
       </div>
     </section>
 
     <el-card>
       <template #header>
         <div>
-          <h3 class="opl-card-title">项目筛选</h3>
-          <p class="opl-card-subtitle">先锁定项目，再进入该项目的问题清单库。</p>
+          <h3 class="opl-card-title">{{ t('projectSelector.filterTitle') }}</h3>
+          <p class="opl-card-subtitle">{{ t('projectSelector.filterSubtitle') }}</p>
         </div>
       </template>
 
       <el-form :model="query" class="filter-grid">
-        <el-form-item label="关键词">
-          <el-input v-model="query.keyword" placeholder="项目编号 / 名称 / 客户" clearable />
+        <el-form-item :label="t('common.label.keyword')">
+          <el-input v-model="query.keyword" :placeholder="`${t('common.label.project')} / ${t('common.label.customer')}`" clearable />
         </el-form-item>
-        <el-form-item label="项目状态">
-          <el-select v-model="query.status" placeholder="全部状态" clearable>
+        <el-form-item :label="t('common.label.status')">
+          <el-select v-model="query.status" :placeholder="t('issueList.allStatus')" clearable>
             <el-option v-for="item in projectStatusOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
       </el-form>
 
       <div class="filter-actions">
-        <el-button type="primary" @click="handleSearch">应用筛选</el-button>
-        <el-button @click="resetQuery">重置</el-button>
+        <el-button type="primary" @click="handleSearch">{{ t('common.action.applyFilter') }}</el-button>
+        <el-button @click="resetQuery">{{ t('common.action.reset') }}</el-button>
       </div>
     </el-card>
 
@@ -47,32 +45,34 @@
           </el-tag>
         </div>
 
-        <p class="project-desc">{{ item.customerName }} · 项目经理 {{ item.projectManagerName }}</p>
+        <p class="project-desc">{{ item.customerName }} / {{ t('common.label.projectManager') }} {{ item.projectManagerName || '-' }}</p>
 
         <div class="opl-inline-meta">
-          <span><strong>开始：</strong>{{ item.startDate || '-' }}</span>
-          <span><strong>计划结束：</strong>{{ item.plannedEndDate || '-' }}</span>
+          <span><strong>{{ t('common.label.startDate') }}:</strong>{{ item.startDate || '-' }}</span>
+          <span><strong>{{ t('common.label.plannedEndDate') }}:</strong>{{ item.plannedEndDate || '-' }}</span>
         </div>
 
         <div class="project-actions">
-          <el-button type="primary" @click="enterIssueLibrary(item)">进入问题库</el-button>
-          <el-button plain @click="enterProjectManage">查看项目</el-button>
+          <el-button type="primary" @click="enterIssueLibrary(item)">{{ t('projectSelector.enterIssueLibrary') }}</el-button>
+          <el-button plain @click="enterProjectManage">{{ t('projectSelector.openProject') }}</el-button>
         </div>
       </el-card>
     </div>
     <el-card v-else>
-      <div class="opl-empty">当前没有符合条件的项目。</div>
+      <div class="opl-empty">{{ t('projectSelector.empty') }}</div>
     </el-card>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { fetchProjectPage, type ProjectItem } from '@/api/project'
-import { getProjectStatusMeta, projectStatusOptions } from '@/utils/view-mappers'
+import { getProjectStatusMeta, getProjectStatusOptions } from '@/utils/view-mappers'
 
 const router = useRouter()
+const { t } = useI18n()
 const list = ref<ProjectItem[]>([])
 
 const query = reactive({
@@ -81,6 +81,8 @@ const query = reactive({
   keyword: '',
   status: ''
 })
+
+const projectStatusOptions = computed(() => getProjectStatusOptions())
 
 async function loadData() {
   const { data } = await fetchProjectPage(query)

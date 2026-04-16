@@ -73,6 +73,21 @@
         </view>
       </view>
 
+      <view class="field-block">
+        <text class="field-label">问题属性</text>
+        <view class="chip-row">
+          <view
+            wx:for="{{issueFunctionOptions}}"
+            wx:key="value"
+            class="chip {{form.issueFunctionCode === item.value ? 'active' : ''}}"
+            data-value="{{item.value}}"
+            bindtap="selectFunction"
+          >
+            {{item.label}}
+          </view>
+        </view>
+      </view>
+
       <view class="switch-grid">
         <view class="switch-card">
           <view class="switch-title">影响出货</view>

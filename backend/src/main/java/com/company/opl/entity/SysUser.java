@@ -26,6 +26,9 @@ public class SysUser extends BaseEntity {
     private LocalDateTime wechatBoundAt;
     private Integer passwordChangeRequired;
     private LocalDateTime passwordChangedAt;
+    private Integer mfaEnabled;
+    private String mfaSecret;
+    private LocalDateTime mfaVerifiedAt;
     private String departmentCode;
     private String departmentName;
     private String status;

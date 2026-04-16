@@ -18,6 +18,8 @@ public class IssueCreateDTO {
     private String projectName;
     private String deviceName;
     private String moduleName;
+    @NotBlank(message = "闂灞炴€т笉鑳戒负绌?")
+    private String issueFunctionCode;
     @NotBlank(message = "问题分类不能为空")
     private String categoryCode;
     @NotBlank(message = "问题来源不能为空")

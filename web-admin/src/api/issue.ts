@@ -7,9 +7,13 @@ export interface IssueQuery {
   keyword?: string
   projectId?: number
   ownerId?: number
+  reporterId?: number
+  issueFunctionCode?: string
   priority?: string
   statusList?: string[]
   overdueOnly?: boolean
+  currentUserRelated?: boolean
+  sortByDueAt?: boolean
 }
 
 export interface IssueDetail extends IssueItem {
@@ -19,6 +23,7 @@ export interface IssueDetail extends IssueItem {
   actionPlan?: string
   deviceName?: string
   moduleName?: string
+  issueFunctionCode?: string
   impactLevel: string
   affectShipment: boolean
   affectCommissioning: boolean
@@ -43,6 +48,11 @@ export interface IssueAssignPayload {
 
 export interface IssuePriorityPayload {
   priority: string
+  remark?: string
+}
+
+export interface IssueFunctionPayload {
+  issueFunctionCode: string
   remark?: string
 }
 
@@ -109,6 +119,7 @@ export interface IssueCreatePayload {
   projectName: string
   deviceName?: string
   moduleName?: string
+  issueFunctionCode: string
   categoryCode: string
   sourceCode: string
   priority: string
@@ -164,6 +175,10 @@ export function assignIssue(id: number, data: IssueAssignPayload) {
 
 export function updateIssuePriority(id: number, data: IssuePriorityPayload) {
   return request.put<unknown, Result<void>>(`/issues/${id}/priority`, data)
+}
+
+export function updateIssueFunction(id: number, data: IssueFunctionPayload) {
+  return request.put<unknown, Result<void>>(`/issues/${id}/function`, data)
 }
 
 export function deleteIssue(id: number) {

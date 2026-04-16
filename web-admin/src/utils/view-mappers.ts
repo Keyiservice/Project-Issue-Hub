@@ -1,3 +1,5 @@
+import i18n from '@/i18n'
+
 type TagType = 'success' | 'warning' | 'info' | 'danger' | 'primary'
 
 interface ViewMeta {
@@ -6,35 +8,55 @@ interface ViewMeta {
   tone: string
 }
 
-const issueStatusMetaMap: Record<string, ViewMeta> = {
-  NEW: { label: '新建', tagType: 'info', tone: 'slate' },
-  IN_PROGRESS: { label: '处理中', tagType: 'warning', tone: 'amber' },
-  PENDING_VERIFY: { label: '待验证', tagType: 'warning', tone: 'orange' },
-  CLOSED: { label: '已关闭', tagType: 'success', tone: 'teal' },
-  ON_HOLD: { label: '已挂起', tagType: 'danger', tone: 'rose' },
-  CANCELED: { label: '已取消', tagType: 'info', tone: 'gray' }
+const issueStatusToneMap: Record<string, Omit<ViewMeta, 'label'>> = {
+  NEW: { tagType: 'info', tone: 'slate' },
+  IN_PROGRESS: { tagType: 'warning', tone: 'amber' },
+  PENDING_VERIFY: { tagType: 'warning', tone: 'orange' },
+  CLOSED: { tagType: 'success', tone: 'teal' },
+  ON_HOLD: { tagType: 'danger', tone: 'rose' },
+  CANCELED: { tagType: 'info', tone: 'gray' }
 }
 
-const issuePriorityMetaMap: Record<string, ViewMeta> = {
-  LOW: { label: '低', tagType: 'info', tone: 'gray' },
-  MEDIUM: { label: '中', tagType: 'primary', tone: 'blue' },
-  HIGH: { label: '高', tagType: 'warning', tone: 'amber' },
-  CRITICAL: { label: '紧急', tagType: 'danger', tone: 'rose' }
+const issuePriorityToneMap: Record<string, Omit<ViewMeta, 'label'>> = {
+  LOW: { tagType: 'info', tone: 'gray' },
+  MEDIUM: { tagType: 'primary', tone: 'blue' },
+  HIGH: { tagType: 'warning', tone: 'amber' },
+  CRITICAL: { tagType: 'danger', tone: 'rose' }
 }
 
-const issueImpactMetaMap: Record<string, ViewMeta> = {
-  LOW: { label: '低影响', tagType: 'info', tone: 'gray' },
-  MEDIUM: { label: '中影响', tagType: 'primary', tone: 'blue' },
-  HIGH: { label: '高影响', tagType: 'warning', tone: 'amber' },
-  CRITICAL: { label: '致命影响', tagType: 'danger', tone: 'rose' }
+const issueImpactToneMap: Record<string, Omit<ViewMeta, 'label'>> = {
+  LOW: { tagType: 'info', tone: 'gray' },
+  MEDIUM: { tagType: 'primary', tone: 'blue' },
+  HIGH: { tagType: 'warning', tone: 'amber' },
+  CRITICAL: { tagType: 'danger', tone: 'rose' }
 }
 
-const projectStatusMetaMap: Record<string, ViewMeta> = {
-  PLANNING: { label: '规划中', tagType: 'info', tone: 'slate' },
-  IN_PROGRESS: { label: '进行中', tagType: 'warning', tone: 'amber' },
-  DELIVERING: { label: '交付中', tagType: 'primary', tone: 'blue' },
-  CLOSED: { label: '已关闭', tagType: 'success', tone: 'teal' },
-  CANCELED: { label: '已取消', tagType: 'info', tone: 'gray' }
+const issueFunctionToneMap: Record<string, Omit<ViewMeta, 'label'>> = {
+  PAT: { tagType: 'primary', tone: 'blue' },
+  FAT: { tagType: 'warning', tone: 'amber' },
+  DESIGN: { tagType: 'info', tone: 'slate' },
+  SAFETY: { tagType: 'danger', tone: 'rose' },
+  LOGISTICS: { tagType: 'info', tone: 'gray' },
+  PROCUREMENT: { tagType: 'warning', tone: 'orange' },
+  ASSEMBLY: { tagType: 'success', tone: 'teal' }
+}
+
+const projectStatusToneMap: Record<string, Omit<ViewMeta, 'label'>> = {
+  PLANNING: { tagType: 'info', tone: 'slate' },
+  IN_PROGRESS: { tagType: 'warning', tone: 'amber' },
+  DELIVERING: { tagType: 'primary', tone: 'blue' },
+  CLOSED: { tagType: 'success', tone: 'teal' },
+  CANCELED: { tagType: 'info', tone: 'gray' }
+}
+
+const issueStatusOrder = ['NEW', 'IN_PROGRESS', 'PENDING_VERIFY', 'CLOSED', 'ON_HOLD', 'CANCELED']
+const issuePriorityOrder = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
+const issueFunctionOrder = ['PAT', 'FAT', 'DESIGN', 'SAFETY', 'LOGISTICS', 'PROCUREMENT', 'ASSEMBLY']
+const projectStatusOrder = ['PLANNING', 'IN_PROGRESS', 'DELIVERING', 'CLOSED', 'CANCELED']
+
+function t(key: string, fallback: string) {
+  const translated = i18n.global.t(key)
+  return typeof translated === 'string' && translated !== key ? translated : fallback
 }
 
 function fallbackMeta(value?: string): ViewMeta {
@@ -46,35 +68,92 @@ function fallbackMeta(value?: string): ViewMeta {
 }
 
 export function getIssueStatusMeta(status?: string) {
-  if (status === 'ACCEPTED') {
-    return issueStatusMetaMap.IN_PROGRESS
+  const normalized = status === 'ACCEPTED' ? 'IN_PROGRESS' : status || ''
+  const tone = issueStatusToneMap[normalized]
+  if (!tone) {
+    return fallbackMeta(status)
   }
-  return issueStatusMetaMap[status || ''] || fallbackMeta(status)
+  return {
+    ...tone,
+    label: t(`enums.issueStatus.${normalized}`, normalized)
+  }
 }
 
 export function getIssuePriorityMeta(priority?: string) {
-  return issuePriorityMetaMap[priority || ''] || fallbackMeta(priority)
+  const tone = issuePriorityToneMap[priority || '']
+  if (!tone) {
+    return fallbackMeta(priority)
+  }
+  return {
+    ...tone,
+    label: t(`enums.priority.${priority}`, priority || '-')
+  }
 }
 
 export function getIssueImpactMeta(impact?: string) {
-  return issueImpactMetaMap[impact || ''] || fallbackMeta(impact)
+  const tone = issueImpactToneMap[impact || '']
+  if (!tone) {
+    return fallbackMeta(impact)
+  }
+  return {
+    ...tone,
+    label: t(`enums.impact.${impact}`, impact || '-')
+  }
+}
+
+export function getIssueFunctionMeta(issueFunctionCode?: string) {
+  const tone = issueFunctionToneMap[issueFunctionCode || '']
+  if (!tone) {
+    return fallbackMeta(issueFunctionCode)
+  }
+  return {
+    ...tone,
+    label: t(`enums.issueFunction.${issueFunctionCode}`, issueFunctionCode || '-')
+  }
 }
 
 export function getProjectStatusMeta(status?: string) {
-  return projectStatusMetaMap[status || ''] || fallbackMeta(status)
+  const tone = projectStatusToneMap[status || '']
+  if (!tone) {
+    return fallbackMeta(status)
+  }
+  return {
+    ...tone,
+    label: t(`enums.projectStatus.${status}`, status || '-')
+  }
 }
 
-export const issueStatusOptions = Object.entries(issueStatusMetaMap).map(([value, meta]) => ({
-  value,
-  label: meta.label
-}))
+export function getIssueStatusOptions() {
+  return issueStatusOrder.map((value) => ({
+    value,
+    label: getIssueStatusMeta(value).label
+  }))
+}
 
-export const issuePriorityOptions = Object.entries(issuePriorityMetaMap).map(([value, meta]) => ({
-  value,
-  label: meta.label
-}))
+export function getIssuePriorityOptions() {
+  return issuePriorityOrder.map((value) => ({
+    value,
+    label: getIssuePriorityMeta(value).label
+  }))
+}
 
-export const projectStatusOptions = Object.entries(projectStatusMetaMap).map(([value, meta]) => ({
-  value,
-  label: meta.label
-}))
+export function getIssueFunctionOptions() {
+  return issueFunctionOrder.map((value) => ({
+    value,
+    label: getIssueFunctionMeta(value).label
+  }))
+}
+
+export function getProjectStatusOptions() {
+  return projectStatusOrder.map((value) => ({
+    value,
+    label: getProjectStatusMeta(value).label
+  }))
+}
+
+export function getRoleLabel(roleCode?: string) {
+  if (!roleCode) {
+    return '-'
+  }
+  return t(`roles.${roleCode}`, roleCode)
+}

@@ -3,13 +3,13 @@
     <section class="opl-page-head">
       <div>
         <p class="opl-section-title">Identity</p>
-        <h2 class="opl-page-title">用户管理</h2>
-        <p class="opl-page-lead">统一维护账号、系统角色、微信绑定和参与项目。</p>
+        <h2 class="opl-page-title">{{ t('page.users') }}</h2>
+        <p class="opl-page-lead">{{ t('user.lead') }}</p>
       </div>
       <div class="opl-page-head-actions">
-        <el-button @click="loadData">刷新</el-button>
-        <el-button @click="openImportDialog">批量导入</el-button>
-        <el-button type="primary" @click="openCreateDialog">新建用户</el-button>
+        <el-button @click="loadData">{{ t('common.action.refresh') }}</el-button>
+        <el-button @click="openImportDialog">{{ t('user.importUsers') }}</el-button>
+        <el-button type="primary" @click="openCreateDialog">{{ t('user.createUser') }}</el-button>
       </div>
     </section>
 
@@ -34,29 +34,29 @@
 
     <el-card>
       <div class="filter-grid">
-        <el-form-item label="关键字">
-          <el-input v-model="query.keyword" placeholder="账号 / 姓名 / 部门" clearable />
-        </el-form-item>
-        <el-form-item label="状态">
-          <el-select v-model="query.status" placeholder="全部状态" clearable>
-            <el-option label="启用" value="ENABLED" />
-            <el-option label="禁用" value="DISABLED" />
-            <el-option label="锁定" value="LOCKED" />
+          <el-form-item :label="t('common.label.keyword')">
+            <el-input v-model="query.keyword" :placeholder="t('user.searchKeywordPlaceholder')" clearable />
+          </el-form-item>
+        <el-form-item :label="t('common.label.status')">
+          <el-select v-model="query.status" :placeholder="t('issueList.allStatus')" clearable>
+            <el-option :label="t('common.status.enabled')" value="ENABLED" />
+            <el-option :label="t('common.status.disabled')" value="DISABLED" />
+            <el-option :label="t('common.status.locked')" value="LOCKED" />
           </el-select>
         </el-form-item>
-        <el-form-item label="部门编码">
+        <el-form-item :label="t('common.label.departmentCode')">
           <el-input v-model="query.departmentCode" placeholder="例如 FS21_ENG" clearable />
         </el-form-item>
       </div>
       <div class="filter-actions">
-        <el-button type="primary" @click="handleSearch">查询</el-button>
-        <el-button @click="resetQuery">重置</el-button>
+        <el-button type="primary" @click="handleSearch">{{ t('common.action.search') }}</el-button>
+        <el-button @click="resetQuery">{{ t('common.action.reset') }}</el-button>
       </div>
     </el-card>
 
     <el-card>
       <el-table :data="list">
-        <el-table-column label="账号" min-width="200">
+        <el-table-column :label="t('common.label.username')" min-width="200">
           <template #default="{ row }">
             <div class="user-main">
               <div class="user-name-line">
@@ -67,52 +67,52 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="部门" min-width="160">
+        <el-table-column :label="t('common.label.department')" min-width="160">
           <template #default="{ row }">
             <div class="user-meta-strong">{{ row.departmentName || '-' }}</div>
             <div class="user-meta">{{ row.departmentCode || '-' }}</div>
           </template>
         </el-table-column>
-        <el-table-column label="系统角色" min-width="180">
+        <el-table-column :label="t('common.label.role')" min-width="180">
           <template #default="{ row }">
             <div class="tag-stack">
               <el-tag v-for="role in getDisplayRoleNames(row)" :key="role" effect="plain">{{ role }}</el-tag>
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="参与项目" width="120" align="center">
+        <el-table-column :label="t('common.label.projectCount')" width="120" align="center">
           <template #default="{ row }">
             <el-button link type="primary" @click="openProjectsDrawer(row)">
               {{ row.projectCount || 0 }} 个
             </el-button>
           </template>
         </el-table-column>
-        <el-table-column label="微信绑定" width="140">
+        <el-table-column :label="t('common.label.wechatBinding')" width="140">
           <template #default="{ row }">
             <el-tag :type="row.wechatBound ? 'success' : 'info'">
-              {{ row.wechatBound ? '已绑定' : '未绑定' }}
+              {{ row.wechatBound ? t('common.status.bound') : t('common.status.unbound') }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="密码状态" width="140">
+        <el-table-column :label="t('common.label.passwordStatus')" width="140">
           <template #default="{ row }">
             <el-tag :type="row.passwordChangeRequired ? 'warning' : 'success'">
-              {{ row.passwordChangeRequired ? '待改密' : '已更新' }}
+              {{ row.passwordChangeRequired ? t('common.status.passwordPending') : t('common.status.passwordUpdated') }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="最近登录" width="170">
+        <el-table-column :label="t('common.label.recentLogin')" width="170">
           <template #default="{ row }">
             {{ formatDateTime(row.lastLoginAt) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="280" fixed="right">
+        <el-table-column :label="t('common.action.viewDetail')" width="280" fixed="right">
           <template #default="{ row }">
             <div class="table-actions">
-              <el-button link type="primary" @click="openEditDialog(row)">编辑</el-button>
-              <el-button link @click="openProjectsDrawer(row)">参与项目</el-button>
-              <el-button link type="primary" @click="handleResetPassword(row)">重置密码</el-button>
-              <el-button link type="warning" :disabled="!row.wechatBound" @click="handleUnbindWechat(row)">解绑微信</el-button>
+              <el-button link type="primary" @click="openEditDialog(row)">{{ t('common.action.edit') }}</el-button>
+              <el-button link @click="openProjectsDrawer(row)">{{ t('common.label.projectCount') }}</el-button>
+              <el-button link type="primary" @click="handleResetPassword(row)">{{ t('user.passwordReset') }}</el-button>
+              <el-button link type="warning" :disabled="!row.wechatBound" @click="handleUnbindWechat(row)">{{ t('user.wechatUnbound') }}</el-button>
             </div>
           </template>
         </el-table-column>
@@ -130,84 +130,84 @@
     </el-card>
   </div>
 
-  <el-dialog v-model="createDialogVisible" title="新建用户" width="760px">
+  <el-dialog v-model="createDialogVisible" :title="t('user.createUserTitle')" width="760px">
     <el-form :model="createForm" label-position="top" class="dialog-grid">
-      <el-form-item label="账号">
+      <el-form-item :label="t('common.label.username')">
         <el-input v-model="createForm.username" placeholder="例如 zhang.peng / 工号" />
       </el-form-item>
-      <el-form-item label="姓名">
+      <el-form-item :label="t('common.label.realName')">
         <el-input v-model="createForm.realName" placeholder="请输入真实姓名" />
       </el-form-item>
-      <el-form-item label="部门编码">
+      <el-form-item :label="t('common.label.departmentCode')">
         <el-input v-model="createForm.departmentCode" placeholder="例如 FS21_ENG" />
       </el-form-item>
-      <el-form-item label="部门名称">
+      <el-form-item :label="t('common.label.department')">
         <el-input v-model="createForm.departmentName" placeholder="例如 FS21 Engineering" />
       </el-form-item>
-      <el-form-item label="手机号">
+      <el-form-item :label="t('common.label.mobile')">
         <el-input v-model="createForm.mobile" placeholder="可选" />
       </el-form-item>
-      <el-form-item label="邮箱">
+      <el-form-item :label="t('common.label.email')">
         <el-input v-model="createForm.email" placeholder="可选" />
       </el-form-item>
-      <el-form-item label="系统角色" class="full-span">
-        <el-select v-model="createForm.roleCodes" multiple filterable placeholder="至少选择一个角色">
+      <el-form-item :label="t('common.label.role')" class="full-span">
+        <el-select v-model="createForm.roleCodes" multiple filterable :placeholder="t('user.roleRequired')">
           <el-option v-for="role in roleOptions" :key="role.roleCode" :label="role.roleName" :value="role.roleCode" />
         </el-select>
       </el-form-item>
-      <el-form-item label="初始密码" class="full-span">
+      <el-form-item :label="t('user.initialPassword')" class="full-span">
         <el-input v-model="createForm.initialPassword" placeholder="留空则使用 123456" />
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button @click="createDialogVisible = false">取消</el-button>
-      <el-button type="primary" @click="submitCreate">创建</el-button>
+      <el-button @click="createDialogVisible = false">{{ t('common.action.cancel') }}</el-button>
+      <el-button type="primary" @click="submitCreate">{{ t('common.action.create') }}</el-button>
     </template>
   </el-dialog>
 
-  <el-dialog v-model="editDialogVisible" title="编辑用户" width="760px">
+  <el-dialog v-model="editDialogVisible" :title="t('user.editUserTitle')" width="760px">
     <el-form :model="editForm" label-position="top" class="dialog-grid">
-      <el-form-item label="账号">
+      <el-form-item :label="t('common.label.username')">
         <el-input v-model="editForm.username" placeholder="例如 zhang.peng / 工号" />
       </el-form-item>
-      <el-form-item label="姓名">
+      <el-form-item :label="t('common.label.realName')">
         <el-input v-model="editForm.realName" placeholder="请输入真实姓名" />
       </el-form-item>
-      <el-form-item label="部门编码">
+      <el-form-item :label="t('common.label.departmentCode')">
         <el-input v-model="editForm.departmentCode" placeholder="例如 FS21_ENG" />
       </el-form-item>
-      <el-form-item label="部门名称">
+      <el-form-item :label="t('common.label.department')">
         <el-input v-model="editForm.departmentName" placeholder="例如 FS21 Engineering" />
       </el-form-item>
-      <el-form-item label="手机号">
+      <el-form-item :label="t('common.label.mobile')">
         <el-input v-model="editForm.mobile" placeholder="可选" />
       </el-form-item>
-      <el-form-item label="邮箱">
+      <el-form-item :label="t('common.label.email')">
         <el-input v-model="editForm.email" placeholder="可选" />
       </el-form-item>
-      <el-form-item label="系统角色" class="full-span">
-        <el-select v-model="editForm.roleCodes" multiple filterable placeholder="至少选择一个角色">
+      <el-form-item :label="t('common.label.role')" class="full-span">
+        <el-select v-model="editForm.roleCodes" multiple filterable :placeholder="t('user.roleRequired')">
           <el-option v-for="role in roleOptions" :key="role.roleCode" :label="role.roleName" :value="role.roleCode" />
         </el-select>
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button @click="editDialogVisible = false">取消</el-button>
-      <el-button type="primary" @click="submitEdit">保存</el-button>
+      <el-button @click="editDialogVisible = false">{{ t('common.action.cancel') }}</el-button>
+      <el-button type="primary" @click="submitEdit">{{ t('common.action.save') }}</el-button>
     </template>
   </el-dialog>
 
-  <el-dialog v-model="importDialogVisible" title="批量导入用户" width="860px">
+  <el-dialog v-model="importDialogVisible" :title="t('user.importTitle')" width="860px">
     <div class="import-guide">
       <div>每行一个用户，格式：</div>
       <code>账号,姓名,部门编码,部门名称,角色代码,手机号,邮箱</code>
       <div>角色代码多个时用 <code>|</code> 分隔，例如 <code>SITE_USER|PROJECT_MANAGER</code></div>
     </div>
     <el-form :model="importForm" label-position="top">
-      <el-form-item label="初始密码">
+      <el-form-item :label="t('user.initialPassword')">
         <el-input v-model="importForm.initialPassword" placeholder="留空则使用 123456" />
       </el-form-item>
-      <el-form-item label="导入内容">
+      <el-form-item :label="t('common.action.import')">
         <el-input
           v-model="importForm.rawText"
           type="textarea"
@@ -217,8 +217,8 @@
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button @click="importDialogVisible = false">取消</el-button>
-      <el-button type="primary" @click="submitImport">开始导入</el-button>
+      <el-button @click="importDialogVisible = false">{{ t('common.action.cancel') }}</el-button>
+      <el-button type="primary" @click="submitImport">{{ t('common.action.import') }}</el-button>
     </template>
   </el-dialog>
 
@@ -277,6 +277,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   createUser,
@@ -292,8 +293,10 @@ import {
   type UserListItem,
   type UserProjectParticipationItem
 } from '@/api/user'
+import { getRoleLabel } from '@/utils/view-mappers'
 
 const router = useRouter()
+const { t } = useI18n()
 const ACCESS_ROLE_CODES = ['SITE_USER', 'RESP_ENGINEER', 'PROJECT_MANAGER', 'MANAGEMENT', 'ADMIN']
 const list = ref<UserListItem[]>([])
 const total = ref(0)
@@ -402,7 +405,9 @@ function getDisplayRoleCodes(roleCodes: string[]) {
 
 function getDisplayRoleNames(row: UserListItem) {
   const displayCodes = new Set(getDisplayRoleCodes(row.roleCodes))
-  return row.roleNames.filter((_, index) => displayCodes.has(row.roleCodes[index]))
+  return row.roleCodes
+    .filter((code) => displayCodes.has(code))
+    .map((code) => getRoleLabel(code))
 }
 
 function openCreateDialog() {
@@ -450,11 +455,11 @@ function goProjectTeam(projectId: number) {
 
 async function submitCreate() {
   if (!createForm.username.trim() || !createForm.realName.trim()) {
-    ElMessage.warning('账号和姓名不能为空')
+    ElMessage.warning(t('user.usernameRequired'))
     return
   }
   if (!createForm.roleCodes.length) {
-    ElMessage.warning('至少选择一个角色')
+    ElMessage.warning(t('user.roleRequired'))
     return
   }
   await createUser({
@@ -467,7 +472,7 @@ async function submitCreate() {
     roleCodes: createForm.roleCodes,
     initialPassword: createForm.initialPassword.trim() || undefined
   })
-  ElMessage.success('用户已创建')
+  ElMessage.success(t('user.created'))
   createDialogVisible.value = false
   await loadData()
 }
@@ -477,11 +482,11 @@ async function submitEdit() {
     return
   }
   if (!editForm.username.trim() || !editForm.realName.trim()) {
-    ElMessage.warning('账号和姓名不能为空')
+    ElMessage.warning(t('user.usernameRequired'))
     return
   }
   if (!editForm.roleCodes.length) {
-    ElMessage.warning('至少选择一个角色')
+    ElMessage.warning(t('user.roleRequired'))
     return
   }
   await updateUser(editForm.id, {
@@ -493,7 +498,7 @@ async function submitEdit() {
     departmentName: editForm.departmentName.trim() || undefined,
     roleCodes: editForm.roleCodes
   })
-  ElMessage.success('用户已更新')
+  ElMessage.success(t('user.updated'))
   editDialogVisible.value = false
   await loadData()
 }
@@ -574,7 +579,7 @@ async function handleResetPassword(row: UserListItem) {
     { type: 'warning' }
   )
   await resetUserPassword(row.id)
-  ElMessage.success('密码已重置')
+  ElMessage.success(t('user.passwordReset'))
   await loadData()
 }
 
@@ -585,7 +590,7 @@ async function handleUnbindWechat(row: UserListItem) {
     { type: 'warning' }
   )
   await unbindUserWechat(row.id)
-  ElMessage.success('微信已解绑')
+  ElMessage.success(t('user.wechatUnbound'))
   await loadData()
 }
 

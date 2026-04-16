@@ -48,6 +48,12 @@ security:
   jwt:
     secret: ${JWT_SECRET:opl-platform-super-secret-key-change-this-please}
     expire-minutes: 720
+  mfa:
+    required: true
+    issuer: Project Issue Hub
+    digits: 6
+    step-seconds: 30
+    window: 1
 
 wechat:
   miniapp:

@@ -21,6 +21,16 @@ const impactOptions = [
   { value: 'CRITICAL', label: '关键影响' }
 ]
 
+const issueFunctionOptions = [
+  { value: 'PAT', label: 'PAT' },
+  { value: 'FAT', label: 'FAT' },
+  { value: 'DESIGN', label: '设计' },
+  { value: 'SAFETY', label: '安全' },
+  { value: 'LOGISTICS', label: '物流' },
+  { value: 'PROCUREMENT', label: '采购' },
+  { value: 'ASSEMBLY', label: '装配' }
+]
+
 function resolveProject(options) {
   if (options.projectId) {
     return {
@@ -64,6 +74,7 @@ Page({
       projectName: '',
       categoryCode: 'MECHANICAL',
       sourceCode: 'SITE_CHECK',
+      issueFunctionCode: 'PAT',
       priority: 'HIGH',
       impactLevel: 'HIGH',
       affectShipment: false,
@@ -72,6 +83,7 @@ Page({
       occurredAt: ''
     },
     priorityOptions,
+    issueFunctionOptions,
     impactOptions,
     attachments: []
   },
@@ -158,6 +170,11 @@ Page({
   selectImpact(e) {
     this.setData({
       'form.impactLevel': e.currentTarget.dataset.value
+    })
+  },
+  selectFunction(e) {
+    this.setData({
+      'form.issueFunctionCode': e.currentTarget.dataset.value
     })
   },
   onSwitchChange(e) {
