@@ -24,6 +24,11 @@ Supporting scripts:
 - `../ops/backup-minio.sh`
 - `../ops/backup-runtime-config.sh`
 
+Recovery runbook:
+
+- `../Project-Issue-Hub-RHEL-Recovery-Runbook.md`
+  - Rebuilds a new RHEL server from GitHub plus MySQL/MinIO/config backup.
+
 Recommended review order:
 
 1. Read `security-compliance-matrix.md` for the overall go-live view.

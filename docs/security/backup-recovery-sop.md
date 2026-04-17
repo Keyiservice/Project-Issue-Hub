@@ -74,6 +74,10 @@ Available supporting scripts:
 These scripts are reference scripts and should be copied to the target RHEL
 server, reviewed, and scheduled by cron or enterprise scheduler.
 
+Companion recovery runbook:
+
+- `docs/Project-Issue-Hub-RHEL-Recovery-Runbook.md`
+
 ## 8. Backup Procedure
 
 ### 8.1 MySQL backup
